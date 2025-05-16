@@ -1,7 +1,7 @@
-import mongoose,{Shema} from "mongoose";
-import bcrypt from "bycrypt";
+import mongoose,{Schema} from "mongoose";
+import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { ref } from "process";
+
 
 const userSchema= new mongoose.Schema({
      email:{
@@ -11,6 +11,11 @@ const userSchema= new mongoose.Schema({
         trim:true,
         lowercase:true,
         index:true
+     },
+     username:{
+        type:String,
+        unique:true,
+        trim:true
      },
      password:{
         type:String,
@@ -53,7 +58,12 @@ userSchema.methods.isPasswordMatched= async function(enteredPassword){
 
 // method to generate access token
 userSchema.methods.generateAccessToken = function () {
+    console.log("Generating access token for user:", this._id); // DEBUGGING
+//     console.log('Access Token Secret:', process.env.ACCESS_TOKEN_SECRET);
+//    console.log('Access Token Expiry:', process.env.ACCESS_TOKEN_EXPIRY);
+
     return jwt.sign(
+        
         //payload
         {
             _id: this._id,

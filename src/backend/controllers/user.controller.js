@@ -2,7 +2,6 @@ import mongoose from "mongoose";
 import { asyncHandler } from "../utils/AsyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/user.model.js";
-import { Folder } from "../models/folder.model.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 
 // Method to generate access and refresh tokens
@@ -10,11 +9,13 @@ const generateAccessAndRefreshTokens = async (userId) => {
     try {
         // Fetch user using userId
         const user = await User.findById(userId);
-
+         console.log(user);
         // Generate access and refresh tokens
         const accessToken = user.generateAccessToken(); // Short-lived token, for authentication
+       // console.log("accessToken: ", accessToken); // DEBUGGING
         const refreshToken = user.generateRefreshToken(); // Long-lived token, for getting new access token
-
+        //  console.log("accessToken: ", accessToken); // DEBUGGING
+        //  console.log("refreshToken: ", refreshToken); // DEBUGGING
         // Update and save only refreshToken in DB (user document)
         user.refreshToken = refreshToken;
         await user.save({ validateBeforeSave: false }); // Skip validation (improve performance)
@@ -36,11 +37,11 @@ const registerUser = asyncHandler(async (req, res) => {
     session.startTransaction();
     try {
         // Get data from req
-        const { email, password, fullname } = req.body;
-        console.log(email, password, fullname);
-
+        const { email,username,password, fullname } = req.body;
+        console.log(email,username, password, fullname);
+        
         // If field exists then trim it and return true if it is empty
-        if ([email, password, fullname].some((field) => field?.trim() === "")) {
+        if ([email,username, password, fullname].some((field) => field?.trim() === "")) {
             throw new ApiError(400, "Please provide all required fields");
         }
 
@@ -52,7 +53,12 @@ const registerUser = asyncHandler(async (req, res) => {
 
         // Check if user already exists: email
         const existedUser = await User.findOne({ email });
+        const existedUsername = await User.findOne({ username });
 
+        // Check if user already exists: username
+        if (existedUsername) {
+            throw new ApiError(409, "Username already exists");
+        }
         // If user exists then throw error
         if (existedUser) {
             throw new ApiError(409, "User already exists");
@@ -66,6 +72,7 @@ const registerUser = asyncHandler(async (req, res) => {
             [
                 {
                     email,
+                    username,
                     password,
                     fullname,
                     
@@ -114,31 +121,39 @@ const registerUser = asyncHandler(async (req, res) => {
 
 // LOGIN USER
 const loginUser = asyncHandler(async (req, res) => {
+    console.log("Login called with email: "); // DEBUGGING
     // Get data from user
+    
     const { email, password } = req.body;
-
+    console.log(email,password); // DEBUGGING
     // If field exists then trim it and return true if it is empty
+   
     if ([email, password].some((field) => field?.trim() === "")) {
         throw new ApiError(400, "Please provide all required fields");
     }
-
+    
     // Check if email is valid using javascript's regular expression test method
+
+    
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
         throw new ApiError(400, "Invalid email");
     }
 
     // Find user using email
+    
     const user = await User.findOne({ email });
-
+    
     // If user does not exist then throw error
     if (!user) {
         throw new ApiError(404, "User not found with this email");
     }
 
     // Check if password is correct
-    const isPasswordValid = await user.isPasswordCorrect(password);
+   
+    const isPasswordValid = await user.isPasswordMatched(password);
 
+     // DEBUGGING
     // If password is not valid then throw error
     if (!isPasswordValid) {
         throw new ApiError(401, "Invalid credentials");

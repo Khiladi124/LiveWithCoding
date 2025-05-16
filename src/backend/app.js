@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import cookieparser from 'cookie-parser';
+import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 // ROUTES IMPORT
 import userRouter from "./routes/user.routes.js";
@@ -47,15 +47,3 @@ app.use("/api/v1/users", userRouter); // Give control to userRouter for any rout
 export { app };
 
 
-
-
-
-
-
-
-
-
-
-
-
-export {app};
