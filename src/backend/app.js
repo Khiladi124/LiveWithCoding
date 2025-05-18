@@ -4,7 +4,7 @@ import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 // ROUTES IMPORT
 import userRouter from "./routes/user.routes.js";
-
+import problemRouter from "./routes/problem.routes.js";
 
 dotenv.config({ path: './.env' });
 
@@ -42,7 +42,7 @@ app.use(cookieParser());
 // ROUTES DECLARATION
 
 app.use("/api/v1/users", userRouter); // Give control to userRouter for any routes starting with /users
-
+app.use("/api/v1/problems", problemRouter);
 
 export { app };
 

@@ -1,9 +1,15 @@
 import mongoose,{Schema} from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-
+import { v4 as uuidv4 } from "uuid";
+import { ObjectId } from "mongodb";
 
 const userSchema= new mongoose.Schema({
+    id:{
+        type:String,
+        default:uuidv4,
+        unique:true,
+    },
      email:{
         type:String,
         required:true,
@@ -32,14 +38,14 @@ const userSchema= new mongoose.Schema({
         type:String,
         default:"",
      },
-     isAccessLimited:{
-        type:Boolean,
-        default:false,
-     },
      iat:{
         type:Number,
         default:Math.floor(Date.now()/1000)-30,
-     }
+     },
+     isVerified:{
+            type:Boolean,
+            default:false,
+     },
 
 });
 

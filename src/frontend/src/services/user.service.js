@@ -5,34 +5,41 @@ axios.defaults.withCredentials = true;
 
 const API_URL = import.meta.env.VITE_API_URL + "/api/v1/users"; // TODO: TEST
 
-const register = (fullname, username, email, password) => {
+const register = async (fullname, username, email, password) => {
     console.log("Registering user with email:");
-    return axios.post(`${API_URL}/register`, {
+    const resp= await axios.post(`${API_URL}/register`, {
         email,
         username,
         password,
         fullname
     });
+    return resp;
 };
 
-const login = (email, password) => {
-    console.log("Logging in user with email: called userservice");
+const login =async (email, password) => {
+    // console.log("Logging in user with email: called userservice");
     console.log("Logging in user with email: " + email + " " + password); // DEBUGGING
     email = email.trim();
     password = password.trim();
-    return axios.post(`${API_URL}/login`, {
+    const resp=await axios.post(`${API_URL}/login`, {
         email,
         password
     });
+    return resp;
 };
 
 
-const logout = () => {
-    return axios.post(`${API_URL}/logout`);
+const logout = async (user) => {
+     console.log("Logging out user with email: " + user._id); // DEBUGGING
+    const resp= await axios.post(`${API_URL}/logout`,{
+        user
+    },{withCredentials: true})
+    return resp;
 };
 
-const getUser = () => {
-    return axios.get(`${API_URL}/getUser`);
+const getUser = async () => {
+    const resp= await axios.get(`${API_URL}/getUser`);
+    return resp;
 };
 const userService = {
     register,

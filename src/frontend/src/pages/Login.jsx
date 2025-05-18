@@ -2,12 +2,20 @@ import React from 'react';
 import { useState } from 'react';
 import { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import {useDispatch} from 'react-redux';
+import { setUser } from '../slices/userSlice.js';
 import userService from '../services/user.service.js';
+
 const Login = () => {
     const email = useRef(null);
     const password = useRef(null);
     const [response, setResponse] = useState(null);
+    const dispatch = useDispatch();
+    const setUserData = (user) => {
+        // console.log("Setting user data: ", user); // DEBUGGING
+        dispatch(setUser(user));
+    }
+
     const navigate = useNavigate();
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -18,12 +26,14 @@ const Login = () => {
             console.log("Email or password is empty");
             return;
         }
-    
+       
         console.log("Login called with email: " + emailValue); // DEBUGGING
         try {
             const response = await userService.login(emailValue, passwordValue);
-            console.log(response.data); // DEBUGGING
+            //  console.log("Response",response.data); // DEBUGGING
             setResponse("Login successful");
+            // console.log("User data: ", response.data.data.user); // DEBUGGING
+            setUserData(response.data.data.user);
            setTimeout( () => navigate("/"),1500);
         } catch (error) {
             console.log("Login error: ", error.response.data); // DEBUGGING

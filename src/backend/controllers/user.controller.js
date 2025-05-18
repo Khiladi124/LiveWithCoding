@@ -123,7 +123,7 @@ const registerUser = asyncHandler(async (req, res) => {
 const loginUser = asyncHandler(async (req, res) => {
     console.log("Login called with email: "); // DEBUGGING
     // Get data from user
-    
+    console.log("12133",req.body); // DEBUGGING
     const { email, password } = req.body;
     console.log(email,password); // DEBUGGING
     // If field exists then trim it and return true if it is empty
@@ -201,18 +201,14 @@ const loginUser = asyncHandler(async (req, res) => {
 
 // LOGOUT USER
 const logoutUser = asyncHandler(async (req, res) => {
-    /*
-        -> For logging out user first we need to have either id or email of user.
-        -> And only the authorized user can logout, which we can verify using token.
-        -> Before running the logout logic, we will use verifyJWT middleware.
-        -> verifyJWT middleware will first verify the user on basis of access token.
-       **************** >>>>>>>>>> If token is valid then it will find and add the user object to req object. <<<<<<<<<<<< *****************
-        -> Then out logout method can use req object to get user object.
-    */
-
+   
+     console.log("Logout called"); // DEBUGGING
     // Remove refresh token from DB
+    //  console.log(req.body); // DEBUGGING
+    const {user} = req.body;
+    // console.log(user); // DEBUGGING
     await User.findByIdAndUpdate(
-        req.user._id,
+        user._id,
         {
             $unset: {
                 refreshToken: undefined,
@@ -227,7 +223,7 @@ const logoutUser = asyncHandler(async (req, res) => {
         httpOnly: true,
         secure: true,
     };
-
+     console.log("sending response"); // DEBUGGING
     // Clear cookies and send response
     return res
         .status(200)

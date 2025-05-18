@@ -21,6 +21,10 @@ const App = () => {
       path: "/register",
       element: <Register />,
     },
+    {
+      path: "/logout",
+      element: <Home />,
+    }
   ]);
   return (
       <RouterProvider router={appRouter} />
