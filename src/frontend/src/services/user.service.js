@@ -25,6 +25,7 @@ const login =async (email, password) => {
         email,
         password
     });
+    console.log("Response from login: ", resp); // DEBUGGING
     return resp;
 };
 

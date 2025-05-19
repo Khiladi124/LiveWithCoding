@@ -33,7 +33,7 @@ const Login = () => {
             const response = await userService.login(emailValue, passwordValue);
             //  console.log("Response",response.data); // DEBUGGING
             setResponse("Login successful");
-            // console.log("User data: ", response.data.data.user); // DEBUGGING
+             console.log("User data: ", response.data.data.user); // DEBUGGING
             setUserData(response.data.data.user);
            setTimeout( () => navigate("/"),1500);
         } catch (error) {

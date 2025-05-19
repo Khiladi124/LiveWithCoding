@@ -19,11 +19,15 @@ const updateProblem = async (problemId, problemData) => {
     const updatedProblem=await axios.put(`${API_URL}/updateproblem/${problemId}`, problemData);
     return updatedProblem;
 };
-
+const addProblem = async (problemData) => {
+    const newProblem=await axios.post(`${API_URL}/addproblem`, problemData);
+    return newProblem;
+}
 const problemService = {
     getAllProblems,
     getProblemById,
     updateProblem,
+    addProblem,
 };
 
 export default problemService;

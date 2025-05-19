@@ -4,7 +4,7 @@ import Home from "./pages/Home.jsx";
 import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
 import Problem from "./pages/Problem.jsx";
-
+import Admin from "./pages/Admin.jsx";
 
 
 const App = () => {
@@ -29,6 +29,10 @@ const App = () => {
       path: "/:problemId",
       element: <Problem />,
     },
+    {
+      path: "/admin",
+      element: <Admin />,
+    }
 
   ]);
   return (
