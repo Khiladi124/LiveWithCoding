@@ -213,6 +213,13 @@ const runProblem=asyncHandler(async (req , res) => {
                 console.log('File deleted successfully');
             }
         });
+        fs.unlinkSync(inputPath, (err) => {
+            if (err) {
+                console.error('Error deleting file:', err);
+            } else {
+                console.log('File deleted successfully');
+            }
+        });
        
         // Return success response
          return res.status(201).json(new ApiResponse(201, 'Compiled successfully', submissionData));
