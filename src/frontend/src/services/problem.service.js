@@ -7,6 +7,23 @@ const getAllProblems = async () => {
     const problems=await axios.get(`${API_URL}/getproblem`);
     return problems;
 };
+const submitProblem = async (req) => {
+    const {problemId,lang,code}=req;
+    console.log(problemId,lang,code,req);
+    const response=await axios.post(`${API_URL}/getproblem/${problemId}/submit`,req);
+     console.log(response);
+    return response.data.message;
+   
+    
+}
+const runProblem=async(req)=>{
+     const {problemId}=req;
+     console.log(req);
+    const response=await axios.post(`${API_URL}/getproblem/${problemId}/run`,req);
+    console.log(response);
+    return response.data.message;
+}
+
 
 const getProblemById = async (problemId) => {
     console.log(problemId);
@@ -28,6 +45,8 @@ const problemService = {
     getProblemById,
     updateProblem,
     addProblem,
+    submitProblem,
+    runProblem,
 };
 
 export default problemService;

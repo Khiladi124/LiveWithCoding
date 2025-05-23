@@ -73,7 +73,7 @@ const Home = () => {
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
-                                {response.length > 0 ? (
+                                {response&&response.length > 0 ? (
                                     response.map((problem, i) => (
                                         <tr key={i} className="hover:bg-gray-50 cursor-pointer" onClick={() =>{ user?(navigate(`/${problem.problemId}`)):(navigate('/login'))}}>
                                             <td className="px-6 py-4 whitespace-nowrap">

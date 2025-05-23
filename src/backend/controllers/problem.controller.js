@@ -4,6 +4,12 @@ import {ApiError} from '../utils/ApiError.js';
 import {ApiResponse} from '../utils/ApiResponse.js';
 import {asyncHandler} from '../utils/AsyncHandler.js';
 import {TestCase} from '../models/testCase.model.js';
+import {Submission} from '../models/submission.model.js';
+import generateFile from '../runSubmission/generateFile.js';
+import  execute from '../runSubmission/execute.js';
+import fs from 'fs';
+import { runCode } from '../runSubmission/execute.js';
+
 
 const getAllProblems = asyncHandler(async (req, res) => {
        console.log('Fetching all problems');
@@ -19,6 +25,7 @@ const getAllProblems = asyncHandler(async (req, res) => {
               throw new ApiError(404, 'No problems found');
            }
           // Return success response
+        //  res.send(200).json(new ApiResponse(200, 'Problems fetched successfully', problems));
            return res.status(200).json(new ApiResponse(200, 'Problems fetched successfully', problems));
 
     }catch (error) {
@@ -136,4 +143,85 @@ const updateProblem=asyncHandler(async (req , res) => {
         return res.status(500).json(new ApiResponse(500, 'Server error', { error: error.message }));
     }
 });
-export { getAllProblems, getProblemById , addProblem, updateProblem};
+
+const submitProblem=asyncHandler(async (req , res) => {
+    console.log('Submitting problem');
+    // return res.status(200).json(new ApiResponse(200, 'Problem submitted successfully', {}));
+    try {
+        // Extract problem details from the request body
+        const { problemId } = req.params;
+        const { code, lang } = req.body;
+    //    console.log(problemId,code, lang);
+        // Validate required fields
+        if (!code || !lang) {
+            return res.status(400).json(new ApiResponse(400, 'Code and language are required'));
+        }
+
+        // Construct the problem object
+        const submissionData = {
+            "code": code,
+            "lang": lang,
+            "problemId": problemId,
+            "submittedBy": req.user._id,  // Assuming JWT middleware attaches user info
+            "output": "",
+        };
+
+        const filePath = await generateFile(lang, code);
+        console.log('Filename:', filePath);
+        const output = await execute(filePath);
+        console.log('Output:', output);
+        submissionData.output = output;
+        const submission = new Submission(submissionData);
+         await submission.save();
+
+        // Return success response
+         return res.status(201).json(new ApiResponse(201, 'Problem submitted successfully', {output: output}));
+    } catch(error) {
+         console.error('Error submitting problem:', error);
+        return res.status(500).json(new ApiResponse(500, 'Server error', { error: error.message }));
+    }
+}
+);
+const runProblem=asyncHandler(async (req , res) => {
+    console.log('Running problem');
+   
+    try {
+        // Extract problem details from the request body
+        const { problemId } = req.params;
+        const { code, lang, input } = req.body;
+        console.log(problemId, code, lang, input);
+        // Validate required fields
+        if (!code || !lang) {
+            return res.status(400).json(new ApiResponse(400, 'Code and language are required'));
+        }
+
+        // Construct the problem object
+        const submissionData = {
+             // Assuming JWT middleware attaches user info
+            output: null,
+        };
+        const filePath = await generateFile(lang, code);
+        const inputPath = await generateFile("txt", input);
+        console.log('Filename:', filePath, inputPath);
+        const output = await runCode({filePath, inputPath});
+        console.log('Output:', output);
+        submissionData.output = output;
+        fs.unlinkSync(filePath, (err) => {
+            if (err) {
+                console.error('Error deleting file:', err);
+            } else {
+                console.log('File deleted successfully');
+            }
+        });
+       
+        // Return success response
+         return res.status(201).json(new ApiResponse(201, 'Compiled successfully', submissionData));
+    }
+    catch
+    (error) {
+        console.error('Error running problem:', error);
+        return res.status(500).json(new ApiResponse(500, 'Server error', { error: error.message }));
+    }
+});
+
+export { getAllProblems, getProblemById , addProblem, updateProblem, submitProblem, runProblem};

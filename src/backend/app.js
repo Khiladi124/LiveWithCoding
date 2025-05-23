@@ -40,6 +40,9 @@ app.use(cookieParser());
 
 
 // ROUTES DECLARATION
+app.get("/", (req, res) => {
+    res.send("Welcome to the API");
+});
 
 app.use("/api/v1/users", userRouter); // Give control to userRouter for any routes starting with /users
 app.use("/api/v1/problems", problemRouter);
