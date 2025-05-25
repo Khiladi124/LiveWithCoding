@@ -12,7 +12,7 @@ const submitProblem = async (req) => {
     console.log(problemId,lang,code,req);
     const response=await axios.post(`${API_URL}/getproblem/${problemId}/submit`,req);
      console.log(response);
-    return response.data.message;
+    return response.data;
    
     
 }
@@ -40,6 +40,16 @@ const addProblem = async (problemData) => {
     const newProblem=await axios.post(`${API_URL}/addproblem`, problemData);
     return newProblem;
 }
+const addTestCase = async ( testCaseData,problemId) => {
+    console.log("Adding test case for problem ID:", problemId);
+    if(!problemId || !testCaseData) {
+        throw new Error("Problem ID and test case data are required");
+    }
+    console.log("Adding test case for problem ID:", problemId);
+    console.log("Test case data:", testCaseData);
+    const newTestCase = await axios.post(`${API_URL}/getproblem/${problemId}/addtestcase`, testCaseData);
+    return newTestCase;
+}
 const problemService = {
     getAllProblems,
     getProblemById,
@@ -47,6 +57,7 @@ const problemService = {
     addProblem,
     submitProblem,
     runProblem,
+    addTestCase,
 };
 
 export default problemService;

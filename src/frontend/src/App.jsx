@@ -5,7 +5,7 @@ import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
 import Problem from "./pages/Problem.jsx";
 import Admin from "./pages/Admin.jsx";
-
+import AddTestCase from "./pages/AddTestCase.jsx";
 
 const App = () => {
   const appRouter = createBrowserRouter([
@@ -32,6 +32,10 @@ const App = () => {
     {
       path: "/admin",
       element: <Admin />,
+    },
+    {
+      path:"/addTestCase/:problemId",
+      element:<AddTestCase/>
     }
 
   ]);

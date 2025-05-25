@@ -5,7 +5,7 @@ import problemService from '../services/problem.service';
 import { useNavigate } from 'react-router-dom';
 import { useRef } from 'react';
 import Editor from '@monaco-editor/react';
-
+import Header from './Header';
 
 
 const Problem = () => {
@@ -27,9 +27,9 @@ const Problem = () => {
         "code" : code,
       }
         const response = await problemService.submitProblem(arg);
-         console.log(response.output);
-        setOutput(response.output);
-       
+         console.log(response.data);
+        setOutput(response.data);
+       console.log("code submitted successfully");
     }catch(e){
          console.log("error while submitting code",e);
          return e;
@@ -77,20 +77,7 @@ const Problem = () => {
   return (
     <div className="flex flex-col h-screen bg-gray-100">
       {/* Top Navigation Bar */}
-      <div className="bg-white shadow px-6 py-3 flex items-center justify-between">
-        <div className="flex items-center">
-          <div className="font-bold text-xl text-gray-800 mr-6">LiveCoding</div>
-          <nav className="hidden md:flex space-x-6">
-            <a href="#" className="text-gray-600 hover:text-gray-900 text-sm font-medium" onClick={() => navigate('/')}>Problems</a>
-            <a href="#" className="text-gray-600 hover:text-gray-900 text-sm font-medium">Contest</a>
-            <a href="#" className="text-gray-600 hover:text-gray-900 text-sm font-medium">Discuss</a>
-          </nav>
-        </div>
-        <div className="flex items-center space-x-4">
-          <button className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded text-sm font-medium">Premium</button>
-          <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
-        </div>
-      </div>
+      <Header />
 
       {/* Main Content Area */}
       <div className="flex flex-1 overflow-hidden">
@@ -157,6 +144,7 @@ const Problem = () => {
               <option>Python</option>
               <option>JavaScript</option>
               <option>Java</option>
+              <option>C</option>
             </select>
             <button className="text-sm bg-white border border-gray-300 rounded px-3 py-2 hover:bg-gray-100" onClick={() => setCode("")}>
               Reset

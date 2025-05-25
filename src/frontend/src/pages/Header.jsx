@@ -5,7 +5,7 @@ import { clearUser } from '../slices/userSlice';
 import { useDispatch } from 'react-redux';
 import userService from '../services/user.service.js';
 import { useState, useEffect } from 'react';
-
+import { useParams } from 'react-router-dom';
 
 
 
@@ -16,6 +16,8 @@ const Header = () => {
     let userData = useSelector((state) => state.user.user);
     const [user, setUser] = useState(userData);
     const [admin,setadmin]=useState(false);
+    const problemId = useParams().problemId || null;
+
     useEffect(() => {
         setUser(userData);
         if(userData && userData.isVerified ){
@@ -62,12 +64,22 @@ return(
             </button>
         )}
         {admin && (
-            <button 
-                onClick={() => setTimeout(()=>{navigate('/admin')},200) } 
-                className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded text-sm transition duration-150"
-            >
-                Admin
-            </button>
+            <>
+                <button 
+                    onClick={() => setTimeout(()=>{navigate('/admin')},200) } 
+                    className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded text-sm transition duration-150"
+                >
+                    Admin
+                </button>
+            { problemId && (
+                <button
+                    onClick={() => setTimeout(()=>{navigate(`/addTestCase/${problemId}`)},200) }
+                    className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm transition duration-150"
+                >
+                    Add Test Case
+                </button>
+                )}
+            </>
         )}
         <div className="w-8 h-8 bg-gray-200 rounded-full"> </div>
     </div>

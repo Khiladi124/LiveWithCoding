@@ -7,6 +7,7 @@ import {
     updateProblem,
     submitProblem,
     runProblem,
+    addTestCase,
 } from '../controllers/problem.controller.js';
 
 
@@ -20,6 +21,7 @@ problemRouter.post('/addproblem', verifyJWT, addProblem);
 problemRouter.post('/updateproblem/:problemid', verifyJWT, updateProblem);
 problemRouter.post('/getproblem/:problemId/submit', verifyJWT, submitProblem);
 problemRouter.post('/getproblem/:problemId/run', verifyJWT, runProblem);
+problemRouter.post('/getproblem/:problemId/addtestcase', verifyJWT,addTestCase )
 // problemRouter.get('/getproblem/:problemId/sampletestcases', verifyJWT, getAllTestCases);
 
 export default problemRouter;

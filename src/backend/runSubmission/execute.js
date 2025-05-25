@@ -17,6 +17,7 @@ const execute = (filepath) => {
     const lang = path.extname(filepath).split(".")[1];
     const outPath = path.join(outputPath, `${jobId}.exe`);
     const outputCommands={
+        "c": `gcc ${filepath} -o ${outPath} && cd ${outputPath} && .\\${jobId}.exe`,
         "cpp": `g++ ${filepath} -o ${outPath} && cd ${outputPath} && .\\${jobId}.exe`,
         "java": `javac ${filepath} && java ${path.join(outputPath, jobId)}`,
         "py": `python ${filepath}`,
@@ -47,28 +48,29 @@ export const runCode = async (req) => {
         const outPath = path.join(outputPath, `${jobId}.exe`);
        
         const outputCommands = {
+            c: `gcc ${filePath} -o ${outPath} && cd ${outputPath} && .\\${jobId}.exe < ${inputPath}`,
             cpp: `g++ ${filePath} -o ${outPath} && cd ${outputPath} && .\\${jobId}.exe < ${inputPath}`,
             java: `javac ${filePath} && cd ${outputPath} && java ${jobId} < ${inputPath}`,
             py: `python ${filePath} < ${inputPath}`,
             js: `node ${filePath} < ${inputPath}`,
-            ts: `ts-node ${filePath} < ${inputPath}`,
             c: `gcc ${filePath} -o ${outPath} && cd ${outputPath} && .\\${jobId}.exe < ${inputPath}`,
           };
           
-        return new Promise((resolve, reject) => {
-            exec(
-               outputCommands[lang],
-                (error, stdout, stderr) => {
-                    if (error) {
-                        reject({ error, stderr });
-                    }
-                    if (stderr) {
-                        reject(stderr);
-                    }
-                    resolve(stdout);
+          function runCommandWithTimeout(command, timeout = 1000) {
+            return new Promise((resolve, reject) => {
+              exec(command, { timeout }, (error, stdout, stderr) => {
+                if (error) {
+                  if (error.killed || error.signal === 'SIGTERM') {
+                    return reject(new Error("Time Limit Exceeded"));
+                  }
+                  return reject(error);
                 }
-            );
-        });
+                resolve(stdout);
+              });
+            });
+          }
+         const output = await runCommandWithTimeout(outputCommands[lang], 1000000);
+        return output;
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });

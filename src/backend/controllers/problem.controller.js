@@ -41,7 +41,7 @@ const getProblemById = asyncHandler(async (req, res) => {
             const { problemId } = req.params;
             console.log(problemId);
     
-            const problem = await Problem.findOne({ problemId });
+            const problem = await Problem.findOne({ problemId: String(problemId) });
             console.log(problem);
             if (!problem) {
                //new ApiError(404, 'Problem not found');
@@ -146,37 +146,68 @@ const updateProblem=asyncHandler(async (req , res) => {
 
 const submitProblem=asyncHandler(async (req , res) => {
     console.log('Submitting problem');
-    // return res.status(200).json(new ApiResponse(200, 'Problem submitted successfully', {}));
+   
     try {
-        // Extract problem details from the request body
+       
         const { problemId } = req.params;
         const { code, lang } = req.body;
-    //    console.log(problemId,code, lang);
-        // Validate required fields
+    
         if (!code || !lang) {
             return res.status(400).json(new ApiResponse(400, 'Code and language are required'));
         }
-
-        // Construct the problem object
+        //  console.log(problemId, code, lang);
+     
         const submissionData = {
             "code": code,
             "lang": lang,
             "problemId": problemId,
-            "submittedBy": req.user._id,  // Assuming JWT middleware attaches user info
+            "submittedBy": req.user._id,  
             "output": "",
         };
+        const problem = await Problem.findOne({ "problemId" : problemId }).select('testCases').lean();
+        const testCasesId = problem?.testCases || [];
+       
+        let passedCount = 0;
+         console.log('Test cases:', testCasesId.length);
+         const filePath = await generateFile(lang, code);
+         const testCases = await TestCase.find({ _id: { $in: testCasesId } }).select('input output').lean();
+for (let index = 0; index < testCasesId.length; index++) {
+   const testCase=testCases[index];
+    console.log(testCase.input);
+    const input = testCase.input;
+    const inputPath = await generateFile("txt", input);
+    const output = await runCode({ filePath, inputPath });
+    console.log('Output:', output);
+  
+    fs.unlinkSync(inputPath, (err) => {
+        if (err) {
+            console.error('Error deleting file:', err);
+        } else {
+            console.log('File deleted successfully');
+        }
+    });
+    // Assuming testCases[index].output is an array of accepted outputs
+    if (testCase.output.includes(output.trim())) {
+        passedCount++;
+    }
+}
+fs.unlinkSync(filePath, (err) => {
+    if (err) {
+        console.error('Error deleting file:', err);
+    } else {
+        console.log('File deleted successfully');
+    }
+});
+submissionData.output = `${passedCount}/${testCasesId.length} test cases passed`;
+const submission = new Submission(submissionData);
+await submission.save();
 
-        const filePath = await generateFile(lang, code);
-        console.log('Filename:', filePath);
-        const output = await execute(filePath);
-        console.log('Output:', output);
-        submissionData.output = output;
-        const submission = new Submission(submissionData);
-         await submission.save();
-
-        // Return success response
-         return res.status(201).json(new ApiResponse(201, 'Problem submitted successfully', {output: output}));
-    } catch(error) {
+if (passedCount === testCasesId.length) {
+    return res.status(200).json(new ApiResponse(200, 'Accepted', { submissionId: submission._id, output: submission.output }));
+} else {
+    return res.status(400).json(new ApiResponse(400, 'Wrong Answer', { passed: passedCount }));
+}
+  } catch(error) {
          console.error('Error submitting problem:', error);
         return res.status(500).json(new ApiResponse(500, 'Server error', { error: error.message }));
     }
@@ -220,7 +251,7 @@ const runProblem=asyncHandler(async (req , res) => {
                 console.log('File deleted successfully');
             }
         });
-       
+        console.log(inputPath);
         // Return success response
          return res.status(201).json(new ApiResponse(201, 'Compiled successfully', submissionData));
     }
@@ -231,4 +262,45 @@ const runProblem=asyncHandler(async (req , res) => {
     }
 });
 
-export { getAllProblems, getProblemById , addProblem, updateProblem, submitProblem, runProblem};
+const addTestCase = asyncHandler(async (req, res) => {
+    console.log('Adding test case');
+    try {
+        const { problemId } = req.params;
+        console.log(problemId);
+        const { input, output } = req.body;
+        console.log(input, output);
+        const problem = await Problem.findOne({ problemId });
+        if (!problem) {
+            console.log('Problem not found');
+            return res.status(404).json(new ApiResponse(404, 'Problem not found'));
+        }
+        const _id = problem._id;
+        console.log(_id);
+        
+        if (!input || !output) {
+            return res.status(400).json(new ApiResponse(400, 'Input and output are required'));
+        }
+      
+        const testCaseData = {
+            "problemId": _id,
+            "input": input,
+            "output": output,
+        };
+
+        const newTestCase = new TestCase(testCaseData);
+        await newTestCase.save();
+        if (!problem.testCases) {
+            problem.testCases = [];
+        }
+        
+        problem.testCases.push(newTestCase._id);
+        await Problem.updateOne({ testCases: problem.testCases });
+        console.log('Test case added successfully',problem.testCases.length);
+        return res.status(201).json(new ApiResponse(201, 'Test case added successfully', newTestCase));
+    } catch (error) {
+         console.error('Error adding test case:', error);
+        return res.status(500).json(new ApiResponse(500, 'Server error', { error: error.message }));
+    }
+});
+
+export { getAllProblems, getProblemById , addProblem, updateProblem, submitProblem, runProblem, addTestCase };
