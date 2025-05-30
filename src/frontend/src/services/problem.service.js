@@ -8,20 +8,32 @@ const getAllProblems = async () => {
     return problems;
 };
 const submitProblem = async (req) => {
-    const {problemId,lang,code}=req;
-    console.log(problemId,lang,code,req);
-    const response=await axios.post(`${API_URL}/getproblem/${problemId}/submit`,req);
-     console.log(response);
-    return response.data;
+    try{
+        const {problemId,lang,code}=req;
+        console.log(problemId,lang,code,req);
+        const response=await axios.post(`${API_URL}/getproblem/${problemId}/submit`,req);
+        //  console.log(response);
+        return response;
+    }catch(e){
+        console.log("error while submitting code",e);
+        return e;
+    }
+   
    
     
 }
 const runProblem=async(req)=>{
-     const {problemId}=req;
-     console.log(req);
-    const response=await axios.post(`${API_URL}/getproblem/${problemId}/run`,req);
-    console.log(response);
-    return response.data.message;
+    try{
+        const {problemId}=req;
+        console.log(req);
+       const response=await axios.post(`${API_URL}/getproblem/${problemId}/run`,req);
+       // console.log(response);
+       
+       return response;
+    } catch(e){
+        return e;
+    }
+    
 }
 
 

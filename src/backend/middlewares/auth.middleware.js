@@ -15,10 +15,7 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
         throw new ApiError(401, "Unauthorized request");
     }
 
-    // Verify token using jwt.verify method
-    // If the token is valid, jwt.verify extracts and returns the decoded payload.
-    // Throws error if token is invalid or expired
-    // const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    
     const decodedToken = (() => {
         try {
             return jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);

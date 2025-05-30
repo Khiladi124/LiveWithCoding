@@ -19,6 +19,7 @@ const Problem = () => {
 
 
   const handleSubmit=async ()=>{
+    setOutput("");
     console.log(problemId);
     try{
       const arg={
@@ -27,8 +28,15 @@ const Problem = () => {
         "code" : code,
       }
         const response = await problemService.submitProblem(arg);
-         console.log(response.data);
-        setOutput(response.data);
+         console.log(response);
+         if(response.status!==200)
+         {
+          setOutput(response.response.data.data);
+          return;
+         }else{
+          setOutput(response.data.message.output);
+         }
+      
        console.log("code submitted successfully");
     }catch(e){
          console.log("error while submitting code",e);
@@ -36,7 +44,7 @@ const Problem = () => {
     }
   };
   const handleRun = async () => {
-
+    setOutput("");
     try {
       console.log(input);
       const response = await problemService.runProblem({
@@ -45,8 +53,16 @@ const Problem = () => {
         "code" : code,
         "input":input
       });
-      console.log(response.output);
-      setOutput(response.output);
+      
+      console.log(response);
+      
+      if(response.status===201)
+      {
+        setOutput(response.data.message.output);
+      }else{
+        setOutput(response.data.data);
+      }
+     
     } catch (error) {
       console.error("Error running code:", error);
     }

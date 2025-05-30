@@ -4,21 +4,17 @@ import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/user.model.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 
-// Method to generate access and refresh tokens
+
 const generateAccessAndRefreshTokens = async (userId) => {
     try {
-        // Fetch user using userId
+        
         const user = await User.findById(userId);
-         console.log(user);
-        // Generate access and refresh tokens
-        const accessToken = user.generateAccessToken(); // Short-lived token, for authentication
-       // console.log("accessToken: ", accessToken); // DEBUGGING
-        const refreshToken = user.generateRefreshToken(); // Long-lived token, for getting new access token
-        //  console.log("accessToken: ", accessToken); // DEBUGGING
-        //  console.log("refreshToken: ", refreshToken); // DEBUGGING
-        // Update and save only refreshToken in DB (user document)
-        user.refreshToken = refreshToken;
-        await user.save({ validateBeforeSave: false }); // Skip validation (improve performance)
+       
+     
+        const accessToken = user.generateAccessToken(); 
+        const refreshToken = user.generateRefreshToken(); 
+        
+        await user.save({ validateBeforeSave: false }); 
 
         // Return both tokens
         return { accessToken, refreshToken };

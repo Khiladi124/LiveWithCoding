@@ -15,14 +15,14 @@ if (!fs.existsSync(outputPath)) {
 const execute = (filepath) => {
     const jobId = path.basename(filepath).split(".")[0];
     const lang = path.extname(filepath).split(".")[1];
-    const outPath = path.join(outputPath, `${jobId}.exe`);
+    const outPath = path.join(outputPath, `${jobId}`);
     const outputCommands={
-        "c": `gcc ${filepath} -o ${outPath} && cd ${outputPath} && .\\${jobId}.exe`,
-        "cpp": `g++ ${filepath} -o ${outPath} && cd ${outputPath} && .\\${jobId}.exe`,
-        "java": `javac ${filepath} && java ${path.join(outputPath, jobId)}`,
-        "py": `python ${filepath}`,
-        "js": `node ${filepath}`,
-        "ts": `ts-node ${filepath}`,
+      c: `gcc ${filePath} -o ${outPath} && chmod +x ${outPath} && ${outPath} `,
+      cpp: `g++ ${filePath} -o ${outPath} && chmod +x ${outPath} && ${outPath} `,
+        java: `javac ${filepath} && java ${path.join(outputPath, jobId)}`,
+        py: `python ${filepath}`,
+        js: `node ${filepath}`,
+        ts: `ts-node ${filepath}`,
     }
     return new Promise((resolve, reject) => {
         exec(
@@ -45,15 +45,15 @@ export const runCode = async (req) => {
 
         const jobId = path.basename(filePath).split(".")[0];
         const lang = path.extname(filePath).split(".")[1];
-        const outPath = path.join(outputPath, `${jobId}.exe`);
+        const outPath = path.join(outputPath, `${jobId}`);
        
         const outputCommands = {
-            c: `gcc ${filePath} -o ${outPath} && cd ${outputPath} && .\\${jobId}.exe < ${inputPath}`,
-            cpp: `g++ ${filePath} -o ${outPath} && cd ${outputPath} && .\\${jobId}.exe < ${inputPath}`,
+          c: `gcc ${filePath} -o ${outPath} && chmod +x ${outPath} && ${outPath} < ${inputPath}`,
+          cpp: `g++ ${filePath} -o ${outPath} && chmod +x ${outPath} && ${outPath} < ${inputPath}`,
             java: `javac ${filePath} && cd ${outputPath} && java ${jobId} < ${inputPath}`,
             py: `python ${filePath} < ${inputPath}`,
             js: `node ${filePath} < ${inputPath}`,
-            c: `gcc ${filePath} -o ${outPath} && cd ${outputPath} && .\\${jobId}.exe < ${inputPath}`,
+           
           };
           
           function runCommandWithTimeout(command, timeout = 1000) {
