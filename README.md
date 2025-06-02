@@ -94,76 +94,75 @@ Before you begin, ensure you have the following installed:
 
 ---
 
-## 📦 Installation
 
-```bash
-# Install CodeEase globally
-npm install -g codeease
 
-# Or install locally
-npm install codeease
-```
 
----
-
-## 🔧 Configuration
-
-Create a `codeease.config.js` file in your project root:
-
-```javascript
-module.exports = {
-  // Code generation preferences
-  templates: './templates',
-  outputDir: './src',
-  
-  // AI settings
-  ai: {
-    enabled: true,
-    model: 'gpt-4',
-    maxTokens: 1000
-  },
-  
-  // Language settings
-  languages: ['javascript', 'typescript', 'python', 'java']
-};
-```
-
----
 
 ## 💻 Usage
-
-### 🏃‍♂️ Initialize a New Project
+### 🏃‍♂️ Getting Started
 
 ```bash
-# Create a new project
-codeease init my-awesome-project
+# Clone the repository
+git clone https://github.com/Khiladi124/LiveWithCoding.git
+
+# Navigate to the project directory
+cd LiveWithCoding
+
+# Install dependencies
+npm install
 
 # Start development server
-codeease start
+npm run dev
 
-# Generate code scaffolding
-codeease generate component MyComponent
+# Build the project
+npm run build
 ```
 
-### 🔗 CLI Commands
+### 🔗 Development Commands
 
 <details>
-<summary>📋 View all CLI commands</summary>
+<summary>📋 View all available commands</summary>
 
-#### Project Management
-- `codeease init <project-name>` - Initialize new project
-- `codeease start` - Start development server
-- `codeease build` - Build project for production
+#### Project Setup
+- `npm install` - Install all dependencies
+- `npm run dev` - Start development server with hot reload
+- `npm run build` - Build project for production
+- `npm run start` - Start production server
 
-#### Code Generation
-- `codeease generate <type> <name>` - Generate code templates
-- `codeease analyze` - Analyze code quality
-- `codeease optimize` - Optimize code performance
+#### Code Quality
+- `npm run lint` - Lint code with ESLint
+- `npm run format` - Format code with Prettier
+- `npm run type-check` - Run TypeScript type checking
 
 #### Development Tools
-- `codeease test` - Run test suite
-- `codeease debug` - Start debugger
-- `codeease lint` - Lint code
+- `npm run test` - Run test suite
+- `npm run test:watch` - Run tests in watch mode
+- `npm run coverage` - Generate test coverage report
+
+</details>
+
+### 🛠️ Development Setup
+
+1. **📥 Clone and Install**
+    ```bash
+    git clone https://github.com/Khiladi124/LiveWithCoding.git
+    cd LiveWithCoding
+    npm install
+    ```
+
+2. **🚀 Start Development**
+    ```bash
+    npm run dev
+    ```
+
+3. **🔧 Configure Environment**
+    ```bash
+    # Copy environment template
+    cp .env.example .env
+    
+    # Edit your environment variables
+    nano .env
+    ```
 
 </details>
 
