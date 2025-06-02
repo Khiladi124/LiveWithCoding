@@ -18,7 +18,7 @@ problemRouter.get('/getproblem', getAllProblems);
 problemRouter.get('/getproblem/:problemId', verifyJWT, getProblemById);
 
 problemRouter.post('/addproblem', verifyJWT, addProblem);
-problemRouter.post('/updateproblem/:problemid', verifyJWT, updateProblem);
+problemRouter.post('/updateproblem/:problemId', verifyJWT, updateProblem);
 problemRouter.post('/getproblem/:problemId/submit', verifyJWT, submitProblem);
 problemRouter.post('/getproblem/:problemId/run', verifyJWT, runProblem);
 problemRouter.post('/getproblem/:problemId/addtestcase', verifyJWT,addTestCase )

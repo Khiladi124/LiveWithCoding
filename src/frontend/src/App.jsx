@@ -31,7 +31,7 @@ const App = () => {
     },
     {
       path: "/admin",
-      element: <Admin />,
+      element: <Admin/>,
     },
     {
       path:"/addTestCase/:problemId",

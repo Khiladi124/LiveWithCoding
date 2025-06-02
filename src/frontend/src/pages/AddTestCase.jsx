@@ -59,11 +59,11 @@ const AddTestCase = () => {
                     <form>
                         <div className="mb-4">
                             <label htmlFor="input" className="block text-sm font-medium text-gray-700">Input</label>
-                            <textarea id="input" rows="4" onChange={(e) => setInput(e.target.value)}  value={input} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
+                            <textarea id="input" rows="4" onChange={(e) => setInput(e.target.value)}  value={input} placeholder='type the input....' className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
                         </div>
                         <div className="mb-4">
                             <label htmlFor="output" className="block text-sm font-medium text-gray-700">Output</label>
-                            <textarea id="output" rows="4" onChange={(e) => setOutput(e.target.value)} value={output} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
+                            <textarea id="output" rows="4" onChange={(e) => setOutput(e.target.value)} value={output} placeholder='type the output....' className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
                         </div>
                         {/* <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">Add Test Case</button> */}
                     </form>

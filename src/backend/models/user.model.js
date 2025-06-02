@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { v4 as uuidv4 } from "uuid";
 import { ObjectId } from "mongodb";
+import {Problem} from "./problem.model.js";
 
 const userSchema= new mongoose.Schema({
     id:{
@@ -45,6 +46,17 @@ const userSchema= new mongoose.Schema({
      isVerified:{
             type:Boolean,
             default:false,
+     },
+     problemSolved:{
+        type:[String],
+        default:[],
+        unique:true,
+        validate: {
+            validator: function(v) {
+                return v.every(id => ObjectId.isValid(id));
+            },
+            message: props => `${props.value} contains invalid ObjectId(s)`
+        }
      },
 
 });

@@ -49,17 +49,17 @@ const Register = () => {
     confirmPassword.current.value = null;
     fullName.current.value = null;
     console.log("Registration form submitted");
-  
+
     }
   return (
     <>
     <Header />
       {
         (!response) ? (
-          <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-md w-full space-y-8 bg-white p-8 sm:p-10 rounded-lg shadow-md">
+          <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-black py-12 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-md w-full space-y-8 bg-gray-900/90 backdrop-blur-sm p-8 sm:p-10 rounded-xl shadow-2xl border border-gray-700/50">
               <div>
-                <h1 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                <h1 className="mt-6 text-center text-3xl font-extrabold text-white">
                   Create Account
                 </h1>
               </div>
@@ -67,7 +67,7 @@ const Register = () => {
               <form className="mt-8 space-y-6" onSubmit={(e) => { e.preventDefault(); }}>
                 <div className="space-y-4">
                   <div>
-                    <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">
+                    <label htmlFor="fullName" className="block text-sm font-medium text-gray-300">
                       Full Name
                     </label>
                     <div className="mt-1">
@@ -77,14 +77,14 @@ const Register = () => {
                         type="text"
                         ref={fullName}
                         required
-                        className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                        className="appearance-none block w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-500 bg-gray-800 text-white focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                         placeholder="Enter your full name"
                       />
                     </div>
                   </div>
                   
                   <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-300">
                       Email address
                     </label>
                     <div className="mt-1">
@@ -94,14 +94,14 @@ const Register = () => {
                         type="email"
                         ref={email}
                         required
-                        className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                        className="appearance-none block w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-500 bg-gray-800 text-white focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                         placeholder="Enter your email"
                       />
                     </div>
                   </div>
                   
                   <div>
-                    <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+                    <label htmlFor="username" className="block text-sm font-medium text-gray-300">
                       Username
                     </label>
                     <div className="mt-1">
@@ -111,14 +111,14 @@ const Register = () => {
                         type="text"
                         ref={username}
                         required
-                        className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                        className="appearance-none block w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-500 bg-gray-800 text-white focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                         placeholder="Choose a username"
                       />
                     </div>
                   </div>
                   
                   <div>
-                    <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                    <label htmlFor="password" className="block text-sm font-medium text-gray-300">
                       Password
                     </label>
                     <div className="mt-1">
@@ -128,14 +128,14 @@ const Register = () => {
                         type="password"
                         ref={password}
                         required
-                        className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                        className="appearance-none block w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-500 bg-gray-800 text-white focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                         placeholder="Create a password"
                       />
                     </div>
                   </div>
                   
                   <div>
-                    <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+                    <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-300">
                       Confirm Password
                     </label>
                     <div className="mt-1">
@@ -145,7 +145,7 @@ const Register = () => {
                         type="password"
                         ref={confirmPassword}
                         required
-                        className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                        className="appearance-none block w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-500 bg-gray-800 text-white focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                         placeholder="Confirm your password"
                       />
                     </div>
@@ -156,7 +156,7 @@ const Register = () => {
                   <button
                     type="submit"
                     onClick={handleRegister}
-                    className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out"
+                    className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out shadow-lg"
                   >
                     Register
                   </button>
@@ -164,17 +164,17 @@ const Register = () => {
               </form>
               
               <div className="text-sm text-center mt-4">
-                <p className="text-gray-600">
+                <p className="text-gray-400">
                   Already have an account?{' '}
-                  <a href="/login" className="font-medium text-blue-600 hover:text-blue-500">
+                  <a href="/login" className="font-medium text-blue-400 hover:text-blue-300">
                     Login here
                   </a>
                 </p>
               </div>
               
               {response && (
-                <div className="mt-4 rounded-md bg-teal-50 p-4">
-                  <p className="text-sm font-medium text-teal-800 text-center">
+                <div className="mt-4 rounded-md bg-teal-900/50 p-4 border border-teal-700">
+                  <p className="text-sm font-medium text-teal-300 text-center">
                     {response}
                   </p>
                 </div>

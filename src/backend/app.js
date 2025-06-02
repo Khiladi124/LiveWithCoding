@@ -5,8 +5,9 @@ import dotenv from 'dotenv';
 // ROUTES IMPORT
 import userRouter from "./routes/user.routes.js";
 import problemRouter from "./routes/problem.routes.js";
+import geminiRouter from './routes/gemini.routes.js';
 
-dotenv.config({ path: './.env' });
+dotenv.config();
 
 const app=express();
 
@@ -23,10 +24,10 @@ app.use(
     but only if they are 16 KB or smaller. This helps prevent denial-of-service (DoS)
     attacks by limiting the size of the request body that the server will accept.
 */
-app.use(express.json({ limit: "16kb" }));
+app.use(express.json({ limit: "1MB" }));
 
 // Configure the Express application to parse requests with URL-encoded payloads
-app.use(express.urlencoded({ limit: "16kb", extended: true }));
+app.use(express.urlencoded({ limit: "1MB", extended: true }));
 
 // Configure Express.js application to serve static files from the "public" directory.
 // Any files placed in this directory will be accessible via HTTP requests.
@@ -46,7 +47,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/v1/users", userRouter); // Give control to userRouter for any routes starting with /users
 app.use("/api/v1/problems", problemRouter);
-
+app.use("/api/v1/gemini", geminiRouter);
 export { app };
 
 

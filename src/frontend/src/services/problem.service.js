@@ -62,6 +62,8 @@ const addTestCase = async ( testCaseData,problemId) => {
     const newTestCase = await axios.post(`${API_URL}/getproblem/${problemId}/addtestcase`, testCaseData);
     return newTestCase;
 }
+
+
 const problemService = {
     getAllProblems,
     getProblemById,
@@ -70,6 +72,7 @@ const problemService = {
     submitProblem,
     runProblem,
     addTestCase,
+    
 };
 
 export default problemService;

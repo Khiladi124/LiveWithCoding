@@ -1,79 +1,154 @@
 import fs from 'fs';
 import path from 'path';
-import { v4 as uuid } from 'uuid';
-import {exec} from 'child_process';
+import { spawn, exec } from 'child_process';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const outputPath = path.join(__dirname, "outputs");
+const outputPath = path.join(__dirname, 'outputs');
 
 if (!fs.existsSync(outputPath)) {
-    fs.mkdirSync(outputPath, { recursive: true });
+  fs.mkdirSync(outputPath, { recursive: true });
 }
 
-const execute = (filepath) => {
-    const jobId = path.basename(filepath).split(".")[0];
-    const lang = path.extname(filepath).split(".")[1];
-    const outPath = path.join(outputPath, `${jobId}`);
-    const outputCommands={
-      c: `gcc ${filePath} -o ${outPath} && chmod +x ${outPath} && ${outPath} `,
-      cpp: `g++ ${filePath} -o ${outPath} && chmod +x ${outPath} && ${outPath} `,
-        java: `javac ${filepath} && java ${path.join(outputPath, jobId)}`,
-        py: `python ${filepath}`,
-        js: `node ${filepath}`,
-        ts: `ts-node ${filepath}`,
-    }
-    return new Promise((resolve, reject) => {
-        exec(
-           outputCommands[lang],
-            (error, stdout, stderr) => {
-                if (error) {
-                    reject({ error, stderr });
-                }
-                if (stderr) {
-                    reject(stderr);
-                }
-                resolve(stdout);
-            }
-        );
-    });
-};
-export const runCode = async (req) => {
-    try {
-        const {filePath, inputPath} = req;
+export const runCode = async ({ filePath, inputPath }) => {
+  try {
+    const jobId = path.basename(filePath).split('.')[0];
+    const lang = path.extname(filePath).split('.')[1];
+    const exePath = path.join(outputPath, `${jobId}.exe`);
+    const dirPath = path.dirname(filePath);
 
-        const jobId = path.basename(filePath).split(".")[0];
-        const lang = path.extname(filePath).split(".")[1];
-        const outPath = path.join(outputPath, `${jobId}`);
-       
-        const outputCommands = {
-          c: `gcc ${filePath} -o ${outPath} && chmod +x ${outPath} && ${outPath} < ${inputPath}`,
-          cpp: `g++ ${filePath} -o ${outPath} && chmod +x ${outPath} && ${outPath} < ${inputPath}`,
-            java: `javac ${filePath} && cd ${outputPath} && java ${jobId} < ${inputPath}`,
-            py: `python ${filePath} < ${inputPath}`,
-            js: `node ${filePath} < ${inputPath}`,
-           
-          };
-          
-          function runCommandWithTimeout(command, timeout = 1000) {
-            return new Promise((resolve, reject) => {
-              exec(command, { timeout }, (error, stdout, stderr) => {
-                if (error) {
-                  if (error.killed || error.signal === 'SIGTERM') {
-                    return reject(new Error("Time Limit Exceeded"));
-                  }
-                  return reject(error);
-                }
-                resolve(stdout);
-              });
-            });
-          }
-         const output = await runCommandWithTimeout(outputCommands[lang], 1000000);
-        return output;
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Internal Server Error' });
+    // Determine compile and run commands
+    const compileCommands = {
+      cpp: `g++ "${filePath}" -o "${exePath}"`,
+      c: `gcc "${filePath}" -o "${exePath}"`,
+      java: `javac "${filePath}" -d "${outputPath}"`,
+    };
+
+    const runCommands = {
+      cpp: [exePath],
+      c: [exePath],
+      java: ['java', '-cp', outputPath, jobId],
+      py: ['python', filePath],
+      js: ['node', filePath],
+    };
+
+    if (!runCommands[lang]) {
+      throw new Error(`Unsupported language: ${lang}`);
     }
+
+    // Compile if needed
+    if (compileCommands[lang]) {
+      await new Promise((resolve, reject) => {
+        exec(compileCommands[lang], (error, stdout, stderr) => {
+          if (error) return reject(stderr || error.message);
+          resolve(stdout);
+        });
+      });
+    }
+
+    // Spawn the process
+    return await new Promise((resolve, reject) => {
+      const input = fs.createReadStream(inputPath);
+      const child = spawn(runCommands[lang][0], runCommands[lang].slice(1), {
+        timeout: 10000,
+      });
+
+      let output = '';
+      let errorOutput = '';
+
+      child.stdout.on('data', (data) => {
+        output += data.toString();
+      });
+
+      child.stderr.on('data', (data) => {
+        errorOutput += data.toString();
+      });
+
+      child.on('close', (code) => {
+        if (code !== 0) {
+          return reject(errorOutput || 'Execution failed');
+        }
+        resolve(output.trim());
+      });
+
+      child.on('error', (err) => {
+        reject(`Execution error: ${err.message}`);
+      });
+
+      input.pipe(child.stdin);
+    });
+  } catch (err) {
+    console.error(err);
+    return { error: err.message || 'Internal server error' };
+  }
 };
+
+
+const execute = async (filePath) => {
+  try {
+    const jobId = path.basename(filePath).split('.')[0];
+    const lang = path.extname(filePath).split('.')[1];
+    const exePath = path.join(outputPath, `${jobId}.exe`);
+
+    const compileCommands = {
+      cpp: `g++ "${filePath}" -o "${exePath}"`,
+      c: `gcc "${filePath}" -o "${exePath}"`,
+      java: `javac "${filePath}" -d "${outputPath}"`,
+    };
+
+    const runCommands = {
+      cpp: [exePath],
+      c: [exePath],
+      java: ['java', '-cp', outputPath, jobId],
+      py: ['python', filePath],
+      js: ['node', filePath],
+    };
+
+    if (!runCommands[lang]) {
+      throw new Error(`Unsupported language: ${lang}`);
+    }
+
+    if (compileCommands[lang]) {
+      await new Promise((resolve, reject) => {
+        exec(compileCommands[lang], (error, stdout, stderr) => {
+          if (error) return reject(stderr || error.message);
+          resolve(stdout);
+        });
+      });
+    }
+
+    return await new Promise((resolve, reject) => {
+      const child = spawn(runCommands[lang][0], runCommands[lang].slice(1), {
+        timeout: 10000,
+      });
+
+      let output = '';
+      let errorOutput = '';
+
+      child.stdout.on('data', (data) => {
+        output += data.toString();
+      });
+
+      child.stderr.on('data', (data) => {
+        errorOutput += data.toString();
+      });
+
+      child.on('close', (code) => {
+        if (code !== 0) {
+          return reject(errorOutput || 'Execution failed');
+        }
+        resolve(output.trim());
+      });
+
+      child.on('error', (err) => {
+        reject(`Execution error: ${err.message}`);
+      });
+    });
+  } catch (err) {
+    console.error(err);
+    return { error: err.message || 'Internal server error' };
+  }
+};
+
 export default execute;

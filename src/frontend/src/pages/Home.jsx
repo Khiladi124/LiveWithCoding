@@ -8,98 +8,281 @@ import { useState, useEffect } from 'react';
 import problemService from '../services/problem.service.js';
 import Header from './Header.jsx';
 
+
 const Home = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const userData = useSelector((state) => state.user.user);
     const [response, setResponse] = useState([]);
-    let userData = useSelector((state) => state.user.user);
-    const [user, setUser] = useState(userData);
+    const [loading, setLoading] = useState(true);
+    const [user, setUser] = useState(null);
 
     useEffect(() => {
+        console.log("home" ,userData)
+        setUser(userData);
+        console.log("home" ,user);
+        
         const fetchData = async () => {
             try {
+                setLoading(true);
                 const resp = await problemService.getAllProblems();
-                console.log(resp.data);
                 setResponse(resp.data.message);
             } catch (error) {
-                console.error("Error fetching user:", error);
-            }
+                console.error("Error fetching problems:", error);
+            } 
+               
+            
+            setLoading(false);
+            
         };
         fetchData();
-    }, []);
-    
-  
-    
+      
+    }, [userData, user]);
+
+    const getDifficultyColor = (difficulty) => {
+        switch (difficulty) {
+            case 'easy':
+                return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+            case 'medium':
+                return 'bg-amber-50 text-amber-700 border-amber-200';
+            case 'hard':
+                return 'bg-red-50 text-red-700 border-red-200';
+            default:
+                return 'bg-gray-50 text-gray-700 border-gray-200';
+        }
+    };
+
+    const [searchTerm, setSearchTerm] = useState('');
+    const [selectedDifficulty, setSelectedDifficulty] = useState('');
+    const [selectedTag, setSelectedTag] = useState('');
+    const [filteredProblems, setFilteredProblems] = useState([]);
+
+    useEffect(() => {
+        let filtered = response;
+
+        // Search filter
+        if (searchTerm) {
+            filtered = filtered.filter(problem =>
+                problem.title.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+        }
+
+        // Difficulty filter
+        if (selectedDifficulty) {
+            filtered = filtered.filter(problem =>
+                problem.difficultyLevel === selectedDifficulty
+            );
+        }
+
+        // Tag filter
+        if (selectedTag) {
+            filtered = filtered.filter(problem =>
+                problem.tags && problem.tags.includes(selectedTag)
+            );
+        }
+
+        setFilteredProblems(filtered);
+    }, [response, searchTerm, selectedDifficulty, selectedTag]);
+
+    const getTagColor = (index) => {
+        const colors = [
+            'bg-indigo-50 text-indigo-700 border-indigo-200',
+            'bg-slate-50 text-slate-700 border-slate-200',
+            'bg-violet-50 text-violet-700 border-violet-200',
+            'bg-gray-50 text-gray-700 border-gray-200',
+            'bg-blue-50 text-blue-700 border-blue-200',
+            'bg-stone-50 text-stone-700 border-stone-200',
+        ];
+        return colors[index % colors.length];
+    };
+
+    const getAllTags = () => {
+    const tags = new Set();
+    response.forEach(problem => {
+        if (problem.tags) {
+            problem.tags.forEach(tag => tags.add(tag));
+        }
+    });
+    return Array.from(tags).sort(); // Added sort for better UX
+};
+
     return (
-        <div className="flex flex-col min-h-screen bg-gray-50">
-            {/* Top Navigation Bar */}
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-stone-50 to-gray-100 relative overflow-hidden">
+            {/* Animated background elements */}
+            <div className="absolute inset-0 overflow-hidden">
+                <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-slate-400/10 to-stone-400/10 rounded-full blur-3xl animate-pulse"></div>
+                <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-stone-400/10 to-gray-400/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-slate-400/8 to-stone-400/8 rounded-full blur-3xl animate-pulse delay-500"></div>
+            </div>
+
+            {/* Floating geometric shapes */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute top-20 left-20 w-4 h-4 bg-slate-400/15 rounded-full animate-float"></div>
+                <div className="absolute top-40 right-32 w-6 h-6 bg-stone-400/15 rotate-45 animate-float delay-300"></div>
+                <div className="absolute bottom-40 left-32 w-5 h-5 bg-gray-400/15 rounded-full animate-float delay-700"></div>
+                <div className="absolute top-60 left-1/3 w-3 h-3 bg-slate-400/15 rotate-45 animate-float delay-1000"></div>
+            </div>
+
             <Header />
-            {/* Main Content */}
-           
-            <div className="container mx-auto px-4 py-8 max-w-6xl">
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-                    {/* Header */}
-                    <div className="bg-gray-50 border-b border-gray-200 px-6 py-4">
-                        <div className="flex justify-between items-center">
-                            <h1 className="text-xl font-bold text-gray-800">Problems</h1>
-                            <div className="flex space-x-2">
-                                <button className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1 rounded text-sm">
-                                    Lists
-                                </button>
-                                <button className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1 rounded text-sm">
-                                    Tags
-                                </button>
+            
+            <div className="container mx-auto px-6 py-12 max-w-7xl relative z-10">
+                <div className="mb-8">
+                    <h1 className="text-4xl font-bold bg-gradient-to-r from-slate-800 to-stone-700 bg-clip-text text-transparent mb-2">
+                        Coding Problems
+                    </h1>
+                    <p className="text-slate-600">Challenge yourself with our curated collection of problems</p>
+                </div>
+
+                <div className="bg-white/95 backdrop-blur-xl rounded-xl shadow-xl border border-slate-200/50 overflow-hidden">
+                    {/* Header Section with Filters */}
+                    <div className="bg-gradient-to-r from-slate-50/80 to-stone-50/80 backdrop-blur-sm border-b border-slate-200/50 px-8 py-6">
+                        <div className="flex flex-col space-y-4">
+                            <div className="flex justify-between items-center">
+                                <div className="flex items-center space-x-4">
+                                    <div className="w-2 h-8 bg-gradient-to-b from-slate-600 to-stone-700 rounded-full shadow-lg"></div>
+                                    <h2 className="text-2xl font-semibold bg-gradient-to-r from-slate-800 to-stone-700 bg-clip-text text-transparent">
+                                        Problems
+                                    </h2>
+                                </div>
+                               
+                            </div>
+                            
+                            {/* Search and Filter Bar */}
+                            <div className="flex flex-col sm:flex-row gap-4">
+                                {/* Search Bar */}
+                                <div className="flex-1 relative">
+                                    <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                    </svg>
+                                    <input
+                                        type="text"
+                                        placeholder="Search problems..."
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        className="w-full pl-10 pr-4 py-2 bg-white/90 border border-slate-300/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent backdrop-blur-sm transition-all duration-200"
+                                    />
+                                </div>
+                                
+                                {/* Difficulty Filter */}
+                                <select
+                                    value={selectedDifficulty}
+                                    onChange={(e) => setSelectedDifficulty(e.target.value)}
+                                    className="px-4 py-2 bg-white/90 border border-slate-300/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent backdrop-blur-sm transition-all duration-200"
+                                >
+                                    <option value="">All Difficulties</option>
+                                    <option value="easy">Easy</option>
+                                    <option value="medium">Medium</option>
+                                    <option value="hard">Hard</option>
+                                </select>
+                                
+                                {/* Tag Filter */}
+                                <select
+                                    value={selectedTag}
+                                    onChange={(e) => setSelectedTag(e.target.value)}
+                                    className="px-4 py-2 bg-white/90 border border-slate-300/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent backdrop-blur-sm transition-all duration-200"
+                                >
+                                    <option value="">All Tags</option>
+                                    {getAllTags().map((tag, index) => (
+                                        <option key={index} value={tag}>{tag}</option>
+                                    ))}
+                                </select>
                             </div>
                         </div>
                     </div>
 
-                    {/* Problems Table */}
+                    {/* Table Section */}
                     <div className="overflow-x-auto">
-                        <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gray-50">
-                                <tr>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <table className="min-w-full">
+                            <thead>
+                                <tr className="bg-gradient-to-r from-slate-50/90 to-stone-50/90 backdrop-blur-sm">
+                                    <th className="px-8 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
                                         Status
                                     </th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th className="px-8 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
                                         Title
                                     </th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th className="px-8 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                                        Tags
+                                    </th>
+                                    <th className="px-8 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
                                         Difficulty
                                     </th>
-                                    {/* <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Acceptance
-                                    </th> */}
                                 </tr>
                             </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
-                                {response&&response.length > 0 ? (
-                                    response.map((problem, i) => (
-                                        <tr key={i} className="hover:bg-gray-50 cursor-pointer" onClick={() =>{ user?(navigate(`/${problem.problemId}`)):(navigate('/login'))}}>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="w-5 h-5 rounded-full border border-gray-300"></div>
+                            <tbody className="divide-y divide-slate-100/60">
+                                {loading ? (
+                                    <tr>
+                                        <td colSpan="4" className="px-8 py-16 text-center">
+                                            <div className="flex flex-col items-center space-y-4">
+                                                <div className="animate-spin rounded-full h-8 w-8 border-2 border-slate-500 border-t-transparent"></div>
+                                                <p className="text-slate-500">Loading problems...</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ) : filteredProblems && filteredProblems.length > 0 ? (
+                                    filteredProblems.map((problem, i) => (
+                                        <tr 
+                                            key={i} 
+                                            className="hover:bg-gradient-to-r hover:from-slate-50/60 hover:to-stone-50/60 cursor-pointer transition-all duration-200 group backdrop-blur-sm"
+                                            onClick={() => user ? navigate(`/${problem.problemId}`) : navigate('/login')}
+                                        >
+                                            <td className="px-8 py-6">
+                                                <div className="w-6 h-6 rounded-full border-2 border-slate-300 group-hover:border-slate-500 transition-colors duration-200 flex items-center justify-center">
+                                                    {
+                                                    user && user.problemSolved.includes(problem.problemId) ?
+                                                    (
+                                                        <svg className="w-4 h-4 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                                        </svg>
+                                                    ) : null
+                                                   }
+                                                </div>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm font-medium text-gray-900">{problem.title}</div>
+                                            <td className="px-8 py-6">
+                                                <div className="font-medium text-slate-900 group-hover:text-slate-700 transition-colors duration-200">
+                                                    {problem.title}
+                                                </div>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                                    problem.difficulty === 'Easy' ? 'bg-green-100 text-green-800' : 
-                                                    problem.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-800' : 
-                                                    'bg-red-100 text-red-800'
-                                                }`}>
-                                                    {problem.difficulty || 'Medium'}
+                                            <td className="px-8 py-6">
+                                                <div className="flex flex-wrap gap-2">
+                                                    {problem.tags && problem.tags.length > 0 ? (
+                                                        problem.tags.slice(0, 3).map((tag, tagIndex) => (
+                                                            <span 
+                                                                key={tagIndex}
+                                                                className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${getTagColor(tagIndex)}`}
+                                                            >
+                                                                {tag}
+                                                            </span>
+                                                        ))
+                                                    ) : (
+                                                        <span className="text-slate-400 text-xs">No tags</span>
+                                                    )}
+                                                    {problem.tags && problem.tags.length > 3 && (
+                                                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200">
+                                                            +{problem.tags.length - 3}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </td>
+                                            <td className="px-8 py-6">
+                                                <span className={`inline-flex items-center px-5 py-1.5 rounded-full text-xs font-medium border ${getDifficultyColor(problem.difficultyLevel)}`}>
+                                                    {problem.difficultyLevel}
                                                 </span>
                                             </td>
-                                            {/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                {problem.acceptance || '45.2%'}
-                                            </td> */}
                                         </tr>
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan="4" className="px-6 py-4 text-center text-sm text-gray-500">
-                                            Loading problems...
+                                        <td colSpan="4" className="px-8 py-16 text-center">
+                                            <div className="flex flex-col items-center space-y-4">
+                                                <svg className="w-16 h-16 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                </svg>
+                                                <div>
+                                                    <h3 className="text-lg font-medium text-slate-900 mb-1">No problems found</h3>
+                                                    <p className="text-slate-500">Try adjusting your filters or search term</p>
+                                                </div>
+                                            </div>
                                         </td>
                                     </tr>
                                 )}
@@ -109,7 +292,6 @@ const Home = () => {
                 </div>
             </div>
         </div>
-
     );
 };
 
