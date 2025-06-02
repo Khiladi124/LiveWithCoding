@@ -1,5 +1,5 @@
-git rm --cached .env
-git rm --cached package-lock.json
-git rm -r --cached codes
-git rm -r --cached outputs
-git rm -r --cached node_modules
+.env
+package-lock.json
+codes/
+outputs/
+node_modules/
