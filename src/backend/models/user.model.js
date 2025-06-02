@@ -51,12 +51,6 @@ const userSchema= new mongoose.Schema({
         type:[String],
         default:[],
         unique:true,
-        validate: {
-            validator: function(v) {
-                return v.every(id => ObjectId.isValid(id));
-            },
-            message: props => `${props.value} contains invalid ObjectId(s)`
-        }
      },
 
 });

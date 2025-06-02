@@ -5,12 +5,9 @@ import {ApiResponse} from '../utils/ApiResponse.js';
 import {asyncHandler} from '../utils/AsyncHandler.js';
 import {TestCase} from '../models/testCase.model.js';
 import {Submission} from '../models/submission.model.js';
-import generateFile from '../runSubmission/generateFile.js';
-import  execute from '../runSubmission/execute.js';
-import fs from 'fs';
-import { runCode } from '../runSubmission/execute.js';
-import path from 'path';   
+import path from 'path';
 import { fileURLToPath } from 'url';
+import axios from 'axios';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -203,7 +200,7 @@ const submitProblem=asyncHandler(async (req , res) => {
         if (!code || !lang) {
             return res.status(400).json(new ApiResponse(400, 'Code and language are required'));
         }
-        //  console.log(problemId, code, lang);
+       
      
         const submissionData = {
             "code": code,
@@ -214,29 +211,26 @@ const submitProblem=asyncHandler(async (req , res) => {
         };
         const problem = await Problem.findOne({ "problemId" : problemId }).select('testCases').lean();
         const testCasesId = problem?.testCases || [];
-       
+        const testCases = await TestCase.find({ _id: { $in: testCasesId } }).select('input output').lean();
         let passedCount = 0;
-        
-         const filePath = await generateFile(lang, code);
-         const testCases = await TestCase.find({ _id: { $in: testCasesId } }).select('input output').lean();
          let error=null;
    
 for (let index = 0; index < testCasesId.length; index++) {
+    console.log(testCasesId[index]);
    const testCase=testCases[index];
     console.log(testCase.input);
     const input = testCase.input;
-    const inputPath = await generateFile("txt", input);
-    const output = await runCode({ filePath, inputPath });
+    const response= await axios.post(`${process.env.COMPILER_API_ORIGIN}/run-submission`, { code, lang, input });
+    const output=response.data.output;
     console.log('Output:', output);
-  
-  
     if (testCase.output.includes(output)) {
         passedCount++;
+    }else{
+        break;
     }
     if(output?.error)
     {
         error=output.error;
-        
         break;
     }
 }
@@ -244,13 +238,7 @@ if(error=='Time Limit Exceeded')
 {
     return res.status(400).json(new ApiResponse(400, 'Time Limit Exceeded', { error }));
 }
-fs.unlinkSync(filePath, (err) => {
-    if (err) {
-        console.error('Error deleting file:', err);
-    } else {
-        console.log('File deleted successfully');
-    }
-});
+
 
 submissionData.output = `${passedCount}/${testCasesId.length} test cases passed`;
 const submission = new Submission(submissionData);
@@ -258,8 +246,10 @@ await submission.save();
 
 if (passedCount === testCasesId.length) {
     const user= req.user;
+    if(!(user.problemSolved.includes(problemId))) {
     user.problemSolved.push(problemId);
     await user.save();
+    }
     return res.status(200).json(new ApiResponse(200, 'Accepted', { submissionId: submission._id, output: submission.output }));
 } else {
     return res.status(400).json(new ApiResponse(400, 'Wrong Answer', { passed: passedCount }));
@@ -270,6 +260,8 @@ if (passedCount === testCasesId.length) {
     }
 }
 );
+
+
 const runProblem=asyncHandler(async (req , res) => {
     console.log('Running problem');
    
@@ -288,28 +280,12 @@ const runProblem=asyncHandler(async (req , res) => {
              // Assuming JWT middleware attaches user info
             output: null,
         };
-        const filePath = await generateFile(lang, code);
-        const inputPath = await generateFile("txt", input);
-        console.log('Filename:', filePath, inputPath);
-        const output = await runCode({filePath, inputPath});
+        
+        const response = await axios.post(`${process.env.COMPILER_API_ORIGIN}/run-submission`,{ code, lang, input} );
+        const output=response.data.output;
         console.log('Output:', output);
         submissionData.output = output;
-        fs.unlinkSync(filePath, (err) => {
-            if (err) {
-                console.error('Error deleting file:', err);
-            } else {
-                console.log('File deleted successfully');
-            }
-        });
-        fs.unlinkSync(inputPath, (err) => {
-            if (err) {
-                console.error('Error deleting file:', err);
-            } else {
-                console.log('File deleted successfully');
-            }
-        });
-        console.log(inputPath);
-        // Return success response
+        
          return res.status(201).json(new ApiResponse(201, 'Compiled successfully', submissionData));
     }
     catch

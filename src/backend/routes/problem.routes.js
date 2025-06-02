@@ -15,7 +15,7 @@ const problemRouter = Router();
 
 problemRouter.get('/getproblem', getAllProblems);
 
-problemRouter.get('/getproblem/:problemId', verifyJWT, getProblemById);
+problemRouter.get('/getproblem/:problemId',  getProblemById);
 
 problemRouter.post('/addproblem', verifyJWT, addProblem);
 problemRouter.post('/updateproblem/:problemId', verifyJWT, updateProblem);
