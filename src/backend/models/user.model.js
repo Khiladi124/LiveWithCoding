@@ -75,8 +75,7 @@ userSchema.methods.generateAccessToken = function () {
 //    console.log('Access Token Expiry:', process.env.ACCESS_TOKEN_EXPIRY);
 
     return jwt.sign(
-        
-        //payload
+ 
         {
             _id: this._id,
             email: this.email,
@@ -84,11 +83,8 @@ userSchema.methods.generateAccessToken = function () {
             iat: Math.floor(Date.now() / 1000) - 30, // issued at time
         },
 
-        //secret key
         process.env.ACCESS_TOKEN_SECRET,
 
-        // options
-        // expiresIn: "15min",
         {
             expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
         }

@@ -3,7 +3,6 @@ import { useState, useRef, useEffect } from "react";
 import { useSelector } from "react-redux";
 import problemService from "../services/problem.service";
 import { useNavigate } from "react-router-dom";
-import userService from '../services/user.service.js';
 
 const Admin = () => {
     const [testCases, setTestCases] = useState([]);

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { clearUser } from '../slices/userSlice';
+import { clearUser, setUser } from '../slices/userSlice';
 import userService from '../services/user.service.js';
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
@@ -13,27 +13,94 @@ import Admin from './Admin.jsx';
 const Header = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    let userData = useSelector((state) => state.user.user);
-    const [user, setUser] = useState(null);
+    let userData = useSelector((state) => state.user.user);s
+    let accessToken = useSelector((state) => state.user.accessToken);
+    let refreshToken = useSelector((state) => state.user.refreshToken);
+    const [localUser, setLocalUser] = useState(null);s
     const [admin, setAdmin] = useState(false);
     const problemId = useParams().problemId || null;
 
-    useEffect(() => {
-        setUser(userData);
-        if(userData?.isVerified === true){ 
-            setAdmin(true);
-            console.log("Admin", userData?.isVerified);
-        } else {
-            setAdmin(false);
+    const isTokenExpired = (token) => {
+        if (!token) return true;
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            return payload.exp * 1000 < Date.now();
+        } catch (error) {
+            return true;
         }
-      
-    }, [userData]);
+    };
+
+    useEffect(() => {
+        const checkTokenExpiration = async () => {
+            console.log("Checking token expiration");
+            if (userData && accessToken) {
+                if (!isTokenExpired(accessToken)) {
+                    console.log("Token is valid, setting user data");
+                    setLocalUser(userData);
+                    if(userData?.isVerified === true){ 
+                        setAdmin(true);
+                        console.log("Admin", userData?.isVerified);
+                    } else {
+                        setAdmin(false);
+                    }
+                } else {
+                    // console.log("Access token is expired, attempting to refresh");
+                    if (refreshToken && !isTokenExpired(refreshToken)) {
+                        try {
+                            const response = await userService.refreshToken(refreshToken);
+                            if (response.data && response.data.data.accessToken) {
+                                setLocalUser(response.data.data.user);
+                                const freshUser = response.data.data.user;
+                                const  freshAccessToken = response.data.data.accessToken;
+                                const freshRefreshToken = response.data.data.refreshToken;
+                                
+                                dispatch(setUser({
+                                    user: freshUser,
+                                    accessToken: freshAccessToken,
+                                    refreshToken: freshRefreshToken
+                                }));
+                                // console.log("User data after refresh:", freshUser);
+                                if(freshUser?.isVerified === true){ 
+                                    setAdmin(true);
+                                } else {
+                                    setAdmin(false);
+                                }
+                            } else {
+                                throw new Error("Failed to refresh token");
+                            }
+                        } catch (error) {
+                            console.log("Failed to refresh token, clearing user data", error);
+                            setLocalUser(null);
+                            setAdmin(false);
+                            dispatch(clearUser());
+                        }
+                    } else {
+                        console.log("Refresh token is missing or expired, clearing user data");
+                        setLocalUser(null);
+                        setAdmin(false);
+                        dispatch(clearUser());
+                    }
+                }
+            } else {
+                console.log("No user data or access token available");
+                setLocalUser(null);
+                setAdmin(false);
+            }
+        };
+
+        checkTokenExpiration();
+        
+        // Set up interval to check token expiration periodically
+        const interval = setInterval(checkTokenExpiration, 10000); // Check every 10 seconds
+        
+        return () => clearInterval(interval);
+    }, [userData, accessToken, dispatch, refreshToken]);
 
     const handleLogout = async () => {
         try {
-            await userService.logout(user);
+            await userService.logout(localUser);
             dispatch(clearUser());
-            setUser(null);
+            setLocalUser(null);
             navigate('/');
         } catch (error) {
             console.error("Error logging out:", error);
@@ -48,9 +115,9 @@ const Header = () => {
 
     const confirmLogout = async () => {
         try {
-            await userService.logout(user);
+            await userService.logout(localUser);
             dispatch(clearUser());
-            setUser(null);
+            setLocalUser(null);
             setShowLogoutModal(false);
             navigate('/');
         } catch (error) {
@@ -74,6 +141,14 @@ const Header = () => {
                     </div>
                     
                     <div className="flex items-center space-x-4">
+                        <button
+                            onClick={() => navigate('/home')}
+                            className="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors relative z-50 shadow-md"
+                        >
+                            Problems
+                        </button>
+                       
+                        
                         {admin && (
                             <button
                                 onClick={() => navigate(`/admin`)}
@@ -91,7 +166,7 @@ const Header = () => {
                             </button>
                         )}
                         
-                        {user ? (
+                        {localUser ? (
                             <button
                                 onClick={handleLogoutClick}
                                 className="bg-slate-600 hover:bg-slate-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors relative z-50 shadow-md"
@@ -106,6 +181,12 @@ const Header = () => {
                                 Login
                             </button>
                         )}
+                         <button
+                            onClick={() => navigate('/about')}
+                            className="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors relative z-50 shadow-md"
+                        >
+                            About
+                        </button>
                     </div>
                 </div>
             </header>

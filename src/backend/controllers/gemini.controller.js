@@ -60,7 +60,7 @@ const getReview = async (req, res) => {
         ));
     } catch (error) {
         console.error("Error generating content:", error);
-        return res.status(500).json(new ApiResponse(500, 'error generating content', { error: error.message }));
+        return res.status(500).json(new ApiResponse(500, 'error generating content', { data: error.message }));
     }
 };
 

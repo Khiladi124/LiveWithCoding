@@ -42,10 +42,20 @@ const getUser = async () => {
     const resp= await axios.get(`${API_URL}/getUser`);
     return resp;
 };
+
+const refreshToken = async (refreshToken) => {
+    console.log("Refreshing token with refreshToken: " + refreshToken); // DEBUGGING    
+    const resp= await axios.post(`${API_URL}/refresh`,{
+        refreshToken
+    },{withCredentials: true});
+    console.log("Response from refreshToken: ", resp); // DEBUGGING
+    return resp;
+};
 const userService = {
     register,
     login,
     logout,
-    getUser
+    getUser,
+    refreshToken,
 };
 export default userService;

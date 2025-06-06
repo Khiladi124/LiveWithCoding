@@ -4,10 +4,11 @@ import {
     registerUser,
     loginUser,
     logoutUser,
-    getUser
+    getUser,
+    refreshSession,
 } from "../controllers/user.controller.js";
 
-import { verifyJWT } from "../middlewares/auth.middleware.js";
+import { verifyJWT, verifyRefreshJWT } from "../middlewares/auth.middleware.js";
 
 
 const userRouter = Router();
@@ -18,5 +19,6 @@ userRouter.route("/login").post(loginUser);
 // Secured routes
 userRouter.route("/logout").post(verifyJWT, logoutUser);
 userRouter.route("/getUser").get(verifyJWT, getUser);
+userRouter.route("/refresh").post(verifyRefreshJWT,refreshSession ); // Assuming refresh token logic is handled in getUser
 
 export default userRouter;

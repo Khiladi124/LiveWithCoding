@@ -236,4 +236,50 @@ const getUser = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, req.user, "User authenticated"));
 });
 
-export { registerUser, loginUser, logoutUser, getUser };
+const refreshSession=asyncHandler(async (req, res) => {
+    try{
+    const user = req.user;
+    console.log("Refreshing session for user:", user); // DEBUGGING
+    if(!user) {
+        throw new ApiError(401, "User not authenticated");
+    }
+    const { accessToken, refreshToken: newRefreshToken } = await generateAccessAndRefreshTokens(
+        user._id
+    );
+    // Update user's refresh token in the database
+    user.refreshToken = newRefreshToken;
+    await user.save({ validateBeforeSave: false });
+    // Set cookies for new tokens
+    const options = {
+        httpOnly: true,
+        secure: false, 
+        maxAge: 24 * 60 * 60 * 1000, 
+    };
+    // Send response with new tokens
+    console.log("Session refreshed successfully"); // DEBUGGING
+    console.log("Access Token:", accessToken); // DEBUGGING
+    console.log("New Refresh Token:", newRefreshToken); // DEBUGGING
+    return res
+        .status(200)
+        .cookie("accessToken", accessToken, options)
+        .cookie("refreshToken", newRefreshToken, options)
+        .json(
+            new ApiResponse(
+                200,
+                {
+                    user: user.toObject(),
+                    accessToken,
+                    refreshToken: newRefreshToken,
+                },
+                "Session refreshed successfully"
+            )
+        );
+    } catch (error) {
+        console.error("Error refreshing session:", error);
+        throw new ApiError(500, "Failed to refresh session");
+    }
+});
+
+
+
+export { registerUser, loginUser, logoutUser, getUser , refreshSession };

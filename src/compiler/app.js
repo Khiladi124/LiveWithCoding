@@ -28,10 +28,12 @@ app.post('/run-submission', async (req, res) => {
         if (!code || !lang) {
             return res.status(400).json({ error: 'Code and language are required' });
         }
+        
         const filePath = await generateFile(lang, code);
         if (!filePath) {
             return res.status(500).json({ error: 'Failed to generate file' });
         }
+        console.log(filePath);
         const inputPath = await generateFile('txt', input || '');
         if (!inputPath) {
             return res.status(500).json({ error: 'Failed to generate input file' });

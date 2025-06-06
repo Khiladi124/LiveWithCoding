@@ -9,6 +9,7 @@ import problemService from '../services/problem.service';
 import Editor from '@monaco-editor/react';
 import Header from './Header';
 import getAIReview from '../services/aiReview.service';
+import { useNavigate } from 'react-router-dom';
 
 const Problem = () => {
   const { problemId } = useParams();
@@ -22,6 +23,7 @@ const Problem = () => {
   const [loadingType, setLoadingType] = useState(''); // 'run', 'submit', 'ai-review'
   const [activeTab, setActiveTab] = useState('input');
   const [showAIModal, setShowAIModal] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -52,11 +54,21 @@ const Problem = () => {
       }
       const response = await problemService.submitProblem(arg);
       console.log("Response from submitProblem:", response);
-      if (response.status !== 200) {
+      if(response.status>=400)
+      {
+        setOutput(response.response.data.errors);
+        if(response.response.data.errors === "you are not logged in") {
+         alert("You are not logged in. Please log in to submit your solution.");
+         navigate('/login');
+        }
+      }else{
+        if (response.status !== 200) {
         setOutput(response.response.data.data);
       } else {
         setOutput(response.data.message.output);
       }
+      }
+      
       setActiveTab('output');
     } catch (e) {
       console.log("error while submitting code", e);

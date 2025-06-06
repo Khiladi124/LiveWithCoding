@@ -236,7 +236,7 @@ for (let index = 0; index < testCasesId.length; index++) {
 }
 if(error=='Time Limit Exceeded')
 {
-    return res.status(400).json(new ApiResponse(400, 'Time Limit Exceeded', { error }));
+    return res.status(300).json(new ApiResponse(300, 'Time Limit Exceeded', { error }));
 }
 
 
@@ -252,7 +252,7 @@ if (passedCount === testCasesId.length) {
     }
     return res.status(200).json(new ApiResponse(200, 'Accepted', { submissionId: submission._id, output: submission.output }));
 } else {
-    return res.status(400).json(new ApiResponse(400, 'Wrong Answer', { passed: passedCount }));
+    return res.status(300).json(new ApiResponse(300, 'Wrong Answer', { passed: passedCount }));
 }
   } catch(error) {
          console.error('Error submitting problem:', error);
