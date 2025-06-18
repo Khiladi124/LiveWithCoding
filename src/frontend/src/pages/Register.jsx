@@ -185,9 +185,9 @@ const Register = () => {
                 <div className="text-center mt-6">
                   <p className="text-gray-600">
                     Already have an account?{' '}
-                    <a href="/login" className="font-semibold text-green-600 hover:text-green-700 transition-colors duration-200">
+                    <p onClick={() => navigate("/login")} href="/login" className="font-semibold text-green-600 hover:text-green-700 transition-colors duration-200">
                       Sign in here
-                    </a>
+                    </p>
                   </p>
                 </div>
               </div>
