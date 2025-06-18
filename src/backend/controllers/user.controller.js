@@ -3,6 +3,9 @@ import { asyncHandler } from "../utils/AsyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/user.model.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import sendEmail  from "../utils/SendMail.js";
+import Otp from "../models/otp.model.js";
+import jwt from "jsonwebtoken";
 
 
 const generateAccessAndRefreshTokens = async (userId) => {
@@ -23,47 +26,97 @@ const generateAccessAndRefreshTokens = async (userId) => {
     }
 };
 
-// REGISTER USER USING TRANSACTION
+const verifyOtp=asyncHandler(async (req, res) => {
+  const { email, otp } = req.body;
+
+  const validToken = await Otp.findOne({ email, otp });
+  if (!validToken) return res.status(400).json({ message: 'Invalid or expired OTP' });
+
+  await User.updateOne({ email }, { $set: { isEmailVerified: true } }); // only if your schema supports this
+
+  await Otp.deleteOne({ _id: validToken._id });
+
+  res.status(200).json(new ApiResponse(200, {message: 'Email verified successfully'}, "Email verified successfully"));
+});
+
+const confirmResetPassword = asyncHandler(async (req, res) => {
+    const { activationToken } = req.params;
+    console.log(" cActivation Token:", activationToken); // DEBUGGING
+    const decoded = jwt.verify(activationToken, process.env.RESET_PASSWORD_TOKEN_SECRET);
+    const { email } = decoded;
+    console.log("Decoded email:", email); // DEBUGGING
+    const { newPassword } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) {
+        throw new ApiError(404, "User not found with this email");
+    }
+    if (!newPassword || newPassword.trim() === "") {
+        throw new ApiError(400, "Please provide a new password");
+    }
+    console.log("New Password:", newPassword); // DEBUGGING
+    user.password = newPassword;
+    await user.save();
+    return res.status(200).json(new ApiResponse(200, {message:"Password reset successfully"}, "Password reset successfully"));
+});
+
+const resetPassword = asyncHandler(async (req, res) => {
+    const { email } = req.body;
+
+    const token = jwt.sign({ email }, process.env.RESET_PASSWORD_TOKEN_SECRET, { expiresIn: "10m" });
+    const url = `${process.env.CLIENT_URL}/resetPassword/${token}`;
+    console.log("Reset Password URL:", url); // DEBUGGING
+    await sendEmail(email, url, null, "Reset Your Password");
+    return res.status(200).json(new ApiResponse(200, {}, "Reset password link sent to your email"));
+
+});
+
 const registerUser = asyncHandler(async (req, res) => {
-    // A session is started using mongoose.startSession(), to group multiple operations into a single transaction.
+    
     const session = await mongoose.startSession();
 
-    // The transaction is started with session.startTransaction().
-    // All subsequent operations associated with this session will be part of this transaction.
+   
     session.startTransaction();
     try {
-        // Get data from req
+        
         const { email,username,password, fullname } = req.body;
         console.log(email,username, password, fullname);
-        
-        // If field exists then trim it and return true if it is empty
+       
         if ([email,username, password, fullname].some((field) => field?.trim() === "")) {
             throw new ApiError(400, "Please provide all required fields");
         }
 
-        // Check if email is valid using javascript's regular expression test method
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
             throw new ApiError(400, "Invalid email format");
         }
 
-        // Check if user already exists: email
         const existedUser = await User.findOne({ email });
         const existedUsername = await User.findOne({ username });
 
-        // Check if user already exists: username
         if (existedUsername) {
             throw new ApiError(409, "Username already exists");
         }
-        // If user exists then throw error
+        
         if (existedUser) {
             throw new ApiError(409, "User already exists");
         }
-
        
+        const generateOtp = () => (Math.floor(100000 + Math.random() * 900000)).toString();
+        const otp = generateOtp();
+        console.log("Generated OTP:", otp); // DEBUGGING
+        const activationToken = jwt.sign({ email, otp }, process.env.ACTIVATION_TOKEN_SECRET, {
+            expiresIn: "10m", 
+        });
+        const url = `${process.env.CLIENT_URL}/verifyEmail/${activationToken}`;
+        console.log(url);
+        await Otp.create([{ email, otp }], { session });
+        console.log("OTP generated and saved:", otp); // DEBUGGING
 
-        // Creates the user and links the root folder's ID to the user.
-        // Again, { session } ensures this operation is part of the transaction.
+        // Send email with OTP
+        console.log("Sending email to:", email); // DEBUGGING
+        console.log("Activation URL:", url); // DEBUGGING
+        await sendEmail(email,url,otp,"Verify Your Email");
+
         const user = await User.create(
             [
                 {
@@ -78,8 +131,6 @@ const registerUser = asyncHandler(async (req, res) => {
         );
 
        
-        // If all operations succeed, session.commitTransaction() commits the transaction, making all changes permanent.
-        // The session is then ended with session.endSession().
         await session.commitTransaction();
         session.endSession();
 
@@ -92,7 +143,7 @@ const registerUser = asyncHandler(async (req, res) => {
         if (!createdUser) {
             throw new ApiError(500, "Something went wrong while creating user");
         }
-
+        
         // Send response if user is created successfully
         return res
             .status(201)
@@ -282,4 +333,4 @@ const refreshSession=asyncHandler(async (req, res) => {
 
 
 
-export { registerUser, loginUser, logoutUser, getUser , refreshSession };
+export { registerUser, loginUser, logoutUser, getUser , refreshSession, verifyOtp, resetPassword, confirmResetPassword };

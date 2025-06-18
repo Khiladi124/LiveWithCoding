@@ -1,0 +1,15 @@
+FROM node:24-alpine
+
+WORKDIR /compiler
+
+COPY package*.json ./
+
+RUN apk update && apk add --no-cache python3 g++ openjdk11 gcc
+
+COPY . .
+
+RUN npm install --no-cache-dir -r package.json
+
+EXPOSE 3000
+
+CMD ["node", "index.js"]

@@ -36,7 +36,7 @@ const Landing = () => {
                                 >
                                     Start Coding
                                 </button>
-                                <button className="px-8 py-4 bg-transparent border-2 border-gray-800 text-gray-800 font-semibold rounded-full hover:bg-gray-800 hover:text-white hover:border-gray-900 transform hover:scale-105 transition-all duration-300 shadow-md backdrop-blur-sm">
+                                <button onClick={handleSignUp} className="px-8 py-4 bg-transparent border-2 border-gray-800 text-gray-800 font-semibold rounded-full hover:bg-gray-800 hover:text-white hover:border-gray-900 transform hover:scale-105 transition-all duration-300 shadow-md backdrop-blur-sm">
                                     Sign Up
                                 </button>
                             </div>

@@ -13,10 +13,10 @@ import Admin from './Admin.jsx';
 const Header = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    let userData = useSelector((state) => state.user.user);s
+    let userData = useSelector((state) => state.user.user);
     let accessToken = useSelector((state) => state.user.accessToken);
     let refreshToken = useSelector((state) => state.user.refreshToken);
-    const [localUser, setLocalUser] = useState(null);s
+    const [localUser, setLocalUser] = useState(null);
     const [admin, setAdmin] = useState(false);
     const problemId = useParams().problemId || null;
 
@@ -91,7 +91,7 @@ const Header = () => {
         checkTokenExpiration();
         
         // Set up interval to check token expiration periodically
-        const interval = setInterval(checkTokenExpiration, 10000); // Check every 10 seconds
+        const interval = setInterval(checkTokenExpiration, 20*1000); // Check every 10 seconds
         
         return () => clearInterval(interval);
     }, [userData, accessToken, dispatch, refreshToken]);
@@ -176,7 +176,7 @@ const Header = () => {
                         ) : (
                             <button
                                 onClick={() => navigate('/login')}
-                                className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors relative z-50 shadow-md"
+                                className="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors relative z-50 shadow-md"
                             >
                                 Login
                             </button>
@@ -186,6 +186,13 @@ const Header = () => {
                             className="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors relative z-50 shadow-md"
                         >
                             About
+                        </button>
+                        <button
+                            onClick={() => navigate('/linkedinBot')}
+                            className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors relative z-50 shadow-md"
+                            >
+                                Ask Referral
+                            
                         </button>
                     </div>
                 </div>

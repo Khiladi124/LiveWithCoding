@@ -42,7 +42,19 @@ const getUser = async () => {
     const resp= await axios.get(`${API_URL}/getUser`);
     return resp;
 };
-
+const resetPassword = async (email) => {
+    console.log("Resetting password for email: " + email);
+    const resp = await axios.post(`${API_URL}/resetPassword`, { email });
+    console.log("Response from resetPassword: ", resp);
+    return resp;
+};
+const confirmResetPassword = async (activationToken, newPassword) => {
+    console.log("Confirming reset password with activationToken: " + activationToken);
+    const resp = await axios.post(`${API_URL}/confirmResetPassword/${activationToken}`,{newPassword});
+    console.log("Response from confirmResetPassword: ", resp);
+    return resp;
+};
+        
 const refreshToken = async (refreshToken) => {
     console.log("Refreshing token with refreshToken: " + refreshToken); // DEBUGGING    
     const resp= await axios.post(`${API_URL}/refresh`,{
@@ -51,11 +63,19 @@ const refreshToken = async (refreshToken) => {
     console.log("Response from refreshToken: ", resp); // DEBUGGING
     return resp;
 };
+const verifyEmail = async(email, otp)=>{
+    const resp=await axios.post(`${API_URL}/verifyOtp`,{email,otp});
+    console.log(resp);
+    return resp;
+}
 const userService = {
     register,
     login,
     logout,
     getUser,
     refreshToken,
+    verifyEmail,
+    resetPassword,
+    confirmResetPassword,
 };
 export default userService;

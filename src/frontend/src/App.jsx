@@ -8,12 +8,32 @@ import Admin from "./pages/Admin.jsx";
 import AddTestCase from "./pages/AddTestCase.jsx";
 import Landing from "./pages/Landing.jsx";
 import About from "./pages/About.jsx";
+import VerifyEmail from "./pages/VerifyEmail.jsx";
+import ResetPassword from "./pages/ResetPassword.jsx";
+import ConfirmResetPassword from "./pages/ConfirmResetPassword.jsx";
+import LinkedinBot from "./pages/LinkedinBot.jsx";
 
 const App = () => {
   const appRouter = createBrowserRouter([
     {
+      path: "/linkedinBot",
+      element: <LinkedinBot/>,
+    },
+    {
       path: "/",
       element: <Landing/>,
+    },
+    {
+      path: "/resetPassword",
+      element: <ResetPassword/>
+    },
+    {
+      path: "/resetPassword/:activationToken",
+      element: <ConfirmResetPassword/>
+    },
+    {
+      path:"/verifyEmail/:activationToken",
+      element: <VerifyEmail/>
     },
     {
       path: "/home",

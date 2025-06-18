@@ -15,7 +15,7 @@ export const runCode = async ({ filePath, inputPath }) => {
   try {
     const jobId = path.basename(filePath).split('.')[0];
     const lang = path.extname(filePath).split('.')[1];
-    const exePath = path.join(outputPath, `${jobId}.exe`);
+    const exePath = path.join(outputPath, jobId); // Remove .exe extension
 
     // Determine compile and run commands
     const compileCommands = {
@@ -28,7 +28,7 @@ export const runCode = async ({ filePath, inputPath }) => {
       cpp: [exePath],
       c: [exePath],
       java: ['java', '-cp', outputPath, jobId],
-      py: ['python', filePath],
+      py: ['python3', filePath], // Use python3 on Linux
       js: ['node', filePath],
     };
 
@@ -101,4 +101,3 @@ export const runCode = async ({ filePath, inputPath }) => {
     throw new Error(err.message || 'Internal server error');
   }
 };
-

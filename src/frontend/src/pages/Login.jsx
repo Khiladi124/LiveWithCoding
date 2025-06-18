@@ -140,6 +140,15 @@ const Login = () => {
                                     Create one now
                                 </span>
                             </p>
+                            <p className="text-sm text-gray-600">
+                                Forget Password ?{' '}
+                                <span 
+                                    onClick={() => { navigate("/resetPassword"); }} 
+                                    className="font-medium text-emerald-600 hover:text-emerald-700 cursor-pointer transition-colors duration-200 underline decoration-emerald-500/50 hover:decoration-emerald-600/70"
+                                >
+                                    Reset Password
+                                </span>
+                            </p>
                         </div>
                     </div>
                 </div>

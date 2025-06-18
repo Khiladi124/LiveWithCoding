@@ -6,6 +6,9 @@ import {
     logoutUser,
     getUser,
     refreshSession,
+    verifyOtp,
+    resetPassword,
+    confirmResetPassword,
 } from "../controllers/user.controller.js";
 
 import { verifyJWT, verifyRefreshJWT } from "../middlewares/auth.middleware.js";
@@ -20,5 +23,8 @@ userRouter.route("/login").post(loginUser);
 userRouter.route("/logout").post(verifyJWT, logoutUser);
 userRouter.route("/getUser").get(verifyJWT, getUser);
 userRouter.route("/refresh").post(verifyRefreshJWT,refreshSession ); // Assuming refresh token logic is handled in getUser
+userRouter.post('/verifyOtp', verifyOtp);
+userRouter.post('/resetPassword', resetPassword);
+userRouter.post('/confirmResetPassword/:activationToken', confirmResetPassword);
 
 export default userRouter;

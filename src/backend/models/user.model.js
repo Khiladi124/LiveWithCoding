@@ -43,6 +43,10 @@ const userSchema= new mongoose.Schema({
         type:Number,
         default:Math.floor(Date.now()/1000)-30,
      },
+     isEmailVerified:{
+        type:Boolean,
+        default:false,
+     },
      isVerified:{
             type:Boolean,
             default:false,
