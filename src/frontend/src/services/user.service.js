@@ -24,8 +24,6 @@ const login =async (email, password) => {
     const resp=await axios.post(`${API_URL}/login`, {
         email,
         password
-    },{
-        withCredentials: true
     });
     console.log("Response from login: ", resp); // DEBUGGING
     return resp;
@@ -36,14 +34,14 @@ const logout = async (user) => {
      console.log("Logging out user with email: " + user._id); // DEBUGGING
     const resp= await axios.post(`${API_URL}/logout`,{
         user
-    },{withCredentials: true})
+    },{
+        withCredentials: true
+    })
     return resp;
 };
 
 const getUser = async () => {
-    const resp= await axios.get(`${API_URL}/getUser,`,{
-        withCredentials: true
-    });
+    const resp= await axios.get(`${API_URL}/getUser`);
     return resp;
 };
 const resetPassword = async (email) => {

@@ -34,6 +34,7 @@ const Login = () => {
        
         console.log("Login called with email: " + emailValue); // DEBUGGING
         try {
+            
             const response = await userService.login(emailValue, passwordValue);
             //  console.log("Response",response.data); // DEBUGGING
             setResponse("Login successful");
@@ -42,8 +43,8 @@ const Login = () => {
             setUserData(response.data.data);
            setTimeout( () => navigate("/"),1000);
         } catch (error) {
-            console.log("Login error: ", error.response.data); // DEBUGGING
-            setResponse(error.response.data.message || "Login failed");
+            console.log("Login error: ", error); // DEBUGGING
+            setResponse(error || "Login failed");
         }
     };
     
@@ -124,7 +125,7 @@ const Login = () => {
                     </form>
 
                     {response && (
-                        <div className={`mt-6 p-4 rounded-xl backdrop-blur-sm ${response.includes("successful") ? "bg-emerald-100/80 text-emerald-800 border border-emerald-300/60" : "bg-red-100/80 text-red-800 border border-red-300/60"}`}>
+                        <div className={`mt-6 p-4 rounded-xl backdrop-blur-sm ${response?.includes("successful") ? "bg-emerald-100/80 text-emerald-800 border border-emerald-300/60" : "bg-red-100/80 text-red-800 border border-red-300/60"}`}>
                             {response}
                         </div>
                     )}

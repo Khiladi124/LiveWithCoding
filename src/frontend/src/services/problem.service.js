@@ -28,9 +28,7 @@ const runProblem=async(req)=>{
     try{
         const {problemId}=req;
         console.log(req);
-       const response=await axios.post(`${API_URL}/getproblem/${problemId}/run`,req,{
-              withCredentials: true,
-       });
+       const response=await axios.post(`${API_URL}/getproblem/${problemId}/run`,req);
        // console.log(response);
        
        return response;

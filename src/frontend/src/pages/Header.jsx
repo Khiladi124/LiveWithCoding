@@ -98,6 +98,7 @@ const Header = () => {
 
     const handleLogout = async () => {
         try {
+            console.log("Logging out user:", localUser);
             await userService.logout(localUser);
             dispatch(clearUser());
             setLocalUser(null);
