@@ -220,11 +220,9 @@ const loginUser = asyncHandler(async (req, res) => {
 
     // Cookie options
     const options = {
-        // HttpOnly: Indicates if the cookie is accessible only through the HTTP protocol and not through client-side scripts.
         httpOnly: true,
-        // Secure: Indicates if the cookie should only be transmitted over secure HTTPS connections.
-        secure: false, // TODO: Change to true in production
-        maxAge: 24 * 60 * 60 * 1000, //cookie will expire after 1 day
+        secure: true,
+        maxAge: 24 * 60 * 60 * 1000,
     };
 
     // Send response
@@ -303,7 +301,7 @@ const refreshSession=asyncHandler(async (req, res) => {
     // Set cookies for new tokens
     const options = {
         httpOnly: true,
-        secure: false, 
+        secure: true, 
         maxAge: 24 * 60 * 60 * 1000, 
     };
     // Send response with new tokens
