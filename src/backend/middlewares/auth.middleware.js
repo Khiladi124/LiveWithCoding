@@ -9,7 +9,7 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
     const token =
         req.cookies?.accessToken ||
         req.header("Authorization")?.replace("Bearer ", ""); // Separating token from header
-
+    console.log("Verifying access token middleware called",token); // DEBUGGING
     // Check if token exists
     if (!token) {
         return res.status(400).json(new ApiError(401, "Access token is required for authentication","you are not logged in"));

@@ -11,7 +11,9 @@ const submitProblem = async (req) => {
     try{
         const {problemId,lang,code}=req;
         console.log(problemId,lang,code,req);
-        const response=await axios.post(`${API_URL}/getproblem/${problemId}/submit`,req);
+        const response=await axios.post(`${API_URL}/getproblem/${problemId}/submit`,req.{
+            withCredentials: true,
+        });
         //  console.log(response);
         return response;
     }catch(e){
@@ -26,7 +28,9 @@ const runProblem=async(req)=>{
     try{
         const {problemId}=req;
         console.log(req);
-       const response=await axios.post(`${API_URL}/getproblem/${problemId}/run`,req);
+       const response=await axios.post(`${API_URL}/getproblem/${problemId}/run`,req,{
+              withCredentials: true,
+       });
        // console.log(response);
        
        return response;
@@ -45,11 +49,15 @@ const getProblemById = async (problemId) => {
 };
 
 const updateProblem = async (problemId, problemData) => {
-    const updatedProblem=await axios.put(`${API_URL}/updateproblem/${problemId}`, problemData);
+    const updatedProblem=await axios.put(`${API_URL}/updateproblem/${problemId}`, problemData,{
+        withCredentials: true,
+    });
     return updatedProblem;
 };
 const addProblem = async (problemData) => {
-    const newProblem=await axios.post(`${API_URL}/addproblem`, problemData);
+    const newProblem=await axios.post(`${API_URL}/addproblem`, problemData,{
+        withCredentials: true,
+    });
     return newProblem;
 }
 const addTestCase = async ( testCaseData,problemId) => {
@@ -59,7 +67,9 @@ const addTestCase = async ( testCaseData,problemId) => {
     }
     console.log("Adding test case for problem ID:", problemId);
     console.log("Test case data:", testCaseData);
-    const newTestCase = await axios.post(`${API_URL}/getproblem/${problemId}/addtestcase`, testCaseData);
+    const newTestCase = await axios.post(`${API_URL}/getproblem/${problemId}/addtestcase`, testCaseData,{
+        withCredentials: true,
+    });
     return newTestCase;
 }
 
