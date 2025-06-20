@@ -11,7 +11,7 @@ const submitProblem = async (req) => {
     try{
         const {problemId,lang,code}=req;
         console.log(problemId,lang,code,req);
-        const response=await axios.post(`${API_URL}/getproblem/${problemId}/submit`,req.{
+        const response=await axios.post(`${API_URL}/getproblem/${problemId}/submit`,req,{
             withCredentials: true,
         });
         //  console.log(response);
