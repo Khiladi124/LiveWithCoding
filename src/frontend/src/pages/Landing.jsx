@@ -28,7 +28,7 @@ const Landing = () => {
     };
 
     const handleSignUp = () => {
-        navigate('/register');
+        (btn==="Login")?navigate('/login'):navigate('/register');
     };
 
     return (
