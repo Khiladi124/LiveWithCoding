@@ -10,7 +10,7 @@ import Header from './Header.jsx';
 const Login = () => {
     const email = useRef(null);
     const password = useRef(null);
-    const [response, setResponse] = useState(null);
+    const [response, setResponse] = useState("");
     const dispatch = useDispatch();
     const setUserData = (resp) => {
         // console.log("Setting user data: ", user); // DEBUGGING
