@@ -3,7 +3,7 @@ import {useState} from 'react';
 import problemService from '../services/problem.service';
 import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-
+import Header from './Header';
 
 const AddTestCase = () => {
     const navigate = useNavigate();
@@ -48,6 +48,7 @@ const AddTestCase = () => {
     return (
         problemId && problem && (
     <div>
+        <Header />
         <div className="container mx-auto px-4 py-8 max-w-6xl">
             <h1 className=" text-3xl text-center font-bold text-gray-800">{`${problem.title}`}</h1>
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">

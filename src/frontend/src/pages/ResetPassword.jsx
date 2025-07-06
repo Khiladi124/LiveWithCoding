@@ -1,8 +1,10 @@
 import React from 'react';
 import userService from '../services/user.service';
 import {useRef} from 'react';
+import Header from './Header';
 
 const ResetPassword = () => {
+
     const emailRef = useRef(null);
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -21,7 +23,9 @@ const ResetPassword = () => {
 
 
 return (
+  
     <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
+    <Header />
         <div className="bg-white p-8 rounded shadow-md w-96">
             <h2 className="text-2xl font-bold mb-6 text-center">Reset Password</h2>
             <form onSubmit={handleSubmit} className="space-y-4">

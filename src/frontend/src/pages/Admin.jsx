@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import { useSelector } from "react-redux";
 import problemService from "../services/problem.service";
 import { useNavigate } from "react-router-dom";
+import Header from "./Header";
 
 const Admin = () => {
     const [testCases, setTestCases] = useState([]);
@@ -78,6 +79,7 @@ const Admin = () => {
         
         return (
             <div className="mt-10">
+                <Header />
                 <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-8 border border-blue-100 shadow-lg">
                     <div className="flex items-center gap-3 mb-6">
                         <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">

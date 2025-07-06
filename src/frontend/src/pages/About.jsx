@@ -108,7 +108,7 @@ const About = () => {
     ];
 
     const handleHireMe = () => {
-        window.open('https://drive.google.com/file/d/1avX9zJuMcs2ypDXjTFwmRNmmQRbKSuYv/view?usp=drive_link', '_blank');
+        window.open('https://drive.google.com/file/d/1aH_8efTJCjwSpcVodv9iMgqe6WO1qQJE/view?usp=sharing', '_blank');
     };
 
     return (
