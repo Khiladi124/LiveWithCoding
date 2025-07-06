@@ -37,6 +37,10 @@ const logout = async (user) => {
     },{
         withCredentials: true
     })
+    if(resp.status<301)
+    {
+        localStorage.clear();
+    }
     return resp;
 };
 
