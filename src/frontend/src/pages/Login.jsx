@@ -125,7 +125,7 @@ const Login = () => {
                     </form>
 
                     {response && (
-                        <div className={`mt-6 p-4 rounded-xl backdrop-blur-sm ${response?.includes("successful") ? "bg-emerald-100/80 text-emerald-800 border border-emerald-300/60" : "bg-red-100/80 text-red-800 border border-red-300/60"}`}>
+                        <div className={`mt-6 p-4 rounded-xl backdrop-blur-sm ${response.includes("successful") ? "bg-emerald-100/80 text-emerald-800 border border-emerald-300/60" : "bg-red-100/80 text-red-800 border border-red-300/60"}`}>
                             {response}
                         </div>
                     )}
