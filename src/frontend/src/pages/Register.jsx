@@ -11,7 +11,7 @@ const Register = () => {
   const password = useRef(null);
   const confirmPassword = useRef(null);
   const fullName = useRef(null);
-  const [response, setResponse] = useState(null);
+  const [response, setResponse] = useState("");
 
   const navigate = useNavigate();
   
@@ -190,6 +190,11 @@ const Register = () => {
                     </p>
                   </p>
                 </div>
+                 {response && (
+                        <div className={`mt-6 p-4 rounded-xl backdrop-blur-sm ${typeof response === 'string' && response.includes("successful") ? "bg-emerald-100/80 text-emerald-800 border border-emerald-300/60" : "bg-red-100/80 text-red-800 border border-red-300/60"}`}>
+                            {typeof response === 'string' ? response : JSON.stringify(response)}
+                        </div>
+                    )}
               </div>
             </div>
           </div>
