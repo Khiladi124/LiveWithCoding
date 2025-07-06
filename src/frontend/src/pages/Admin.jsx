@@ -79,7 +79,7 @@ const Admin = () => {
         
         return (
             <div className="mt-10">
-                <Header />
+               
                 <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-8 border border-blue-100 shadow-lg">
                     <div className="flex items-center gap-3 mb-6">
                         <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
@@ -202,6 +202,8 @@ const Admin = () => {
     };
 
     return (
+        <>
+        <Header />
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
             <div className="max-w-6xl mx-auto p-6">
                 {/* Header */}
@@ -398,6 +400,7 @@ const Admin = () => {
                 </div>
             </div>
         </div>
+        </>
     );
 };
 
