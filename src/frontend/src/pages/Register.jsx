@@ -5,6 +5,59 @@ import { useNavigate } from 'react-router-dom';
 import userService from '../services/user.service.js';
 import Header from './Header.jsx';
 
+// Toast Component
+const Toast = ({ message, type, onClose }) => {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onClose();
+    }, 4000);
+    return () => clearTimeout(timer);
+  }, [onClose]);
+
+  const toastStyles = {
+    success: "bg-gradient-to-r from-green-500 to-emerald-500 text-white",
+    error: "bg-gradient-to-r from-red-500 to-pink-500 text-white",
+    warning: "bg-gradient-to-r from-yellow-500 to-orange-500 text-white"
+  };
+
+  const icons = {
+    success: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+      </svg>
+    ),
+    error: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    ),
+    warning: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+      </svg>
+    )
+  };
+
+  return (
+    <div className="fixed top-4 right-4 z-50 animate-slide-in">
+      <div className={`${toastStyles[type]} px-6 py-4 rounded-xl shadow-2xl backdrop-blur-sm border border-white/20 flex items-center space-x-3 min-w-[300px] max-w-md`}>
+        <div className="flex-shrink-0">
+          {icons[type]}
+        </div>
+        <p className="font-medium">{message}</p>
+        <button
+          onClick={onClose}
+          className="ml-auto flex-shrink-0 text-white/80 hover:text-white transition-colors"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  );
+};
+
 const Register = () => {
   const email = useRef(null);
   const username = useRef(null);
@@ -12,6 +65,8 @@ const Register = () => {
   const confirmPassword = useRef(null);
   const fullName = useRef(null);
   const [response, setResponse] = useState("");
+  const [toast, setToast] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
   
@@ -23,9 +78,19 @@ const Register = () => {
       return () => clearTimeout(timer);
     }
   }, [response, navigate]);
+
+  const showToast = (message, type) => {
+    setToast({ message, type });
+  };
+
+  const hideToast = () => {
+    setToast(null);
+  };
   
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
+    
     const emailValue = email.current.value;
     const usernameValue = username.current.value;
     const passwordValue = password.current.value;
@@ -33,42 +98,72 @@ const Register = () => {
     const fullNameValue = fullName.current.value;
     
     if (passwordValue !== confirmPasswordValue) {
-      alert("Passwords do not match");
+      showToast("Passwords do not match!", "error");
+      setIsLoading(false);
+      return;
+    }
+
+    if (passwordValue.length < 6) {
+      showToast("Password must be at least 6 characters long!", "warning");
+      setIsLoading(false);
       return;
     }
     
-    userService.register(fullNameValue, usernameValue, emailValue, passwordValue)
-      .then((response) => {
-        if (response.message === "Request failed with status code 500") {
-          setResponse("Registration failed");
-          alert("Registration failed");
-        }
-        else {
-          setResponse("Registration successful");
-          alert("Registration successful");
-          email.current.value = null;
-         username.current.value = null;
-         password.current.value = null;
-         confirmPassword.current.value = null;
-         fullName.current.value = null;
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-    
+    try {
+      const response = await userService.register(fullNameValue, usernameValue, emailValue, passwordValue);
+      
+      if (response.message === "Request failed with status code 500") {
+        setResponse("Registration failed");
+        showToast("Registration failed! Please try again.", "error");
+      } else {
+        setResponse("Registration successful");
+        showToast("Registration successful! Redirecting to login...", "success");
+        
+        // Clear form fields
+        email.current.value = "";
+        username.current.value = "";
+        password.current.value = "";
+        confirmPassword.current.value = "";
+        fullName.current.value = "";
+      }
+    } catch (error) {
+      console.log(error);
+      showToast("An error occurred during registration!", "error");
+      setResponse("Registration failed");
+    } finally {
+      setIsLoading(false);
+    }
     
     console.log("Registration form submitted");
+  };
 
-    }
   return (
     <>
       <Header />
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={hideToast}
+        />
+      )}
+      
       {
         response === "Registration successful" ? (
           <div className="min-h-screen flex items-center justify-center">
             <div className="text-center">
-              <p className="text-green-600 font-semibold">Registration successful! Redirecting to login...</p>
+              <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full mx-auto mb-4 flex items-center justify-center">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <p className="text-green-600 font-semibold text-lg">Registration successful!</p>
+              <p className="text-gray-500 mt-2">Redirecting to login page...</p>
+              <div className="mt-4">
+                <div className="w-32 h-2 bg-gray-200 rounded-full mx-auto overflow-hidden">
+                  <div className="h-full bg-gradient-to-r from-green-500 to-emerald-500 rounded-full animate-pulse"></div>
+                </div>
+              </div>
             </div>
           </div>
         ) : (
@@ -106,7 +201,8 @@ const Register = () => {
                         type="text"
                         ref={fullName}
                         required
-                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl shadow-sm placeholder-gray-400 bg-white/70 text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 hover:border-gray-300"
+                        disabled={isLoading}
+                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl shadow-sm placeholder-gray-400 bg-white/70 text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 hover:border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
                         placeholder="Enter your full name"
                       />
                     </div>
@@ -121,7 +217,8 @@ const Register = () => {
                         type="email"
                         ref={email}
                         required
-                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl shadow-sm placeholder-gray-400 bg-white/70 text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 hover:border-gray-300"
+                        disabled={isLoading}
+                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl shadow-sm placeholder-gray-400 bg-white/70 text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 hover:border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
                         placeholder="Enter your email"
                       />
                     </div>
@@ -136,7 +233,8 @@ const Register = () => {
                         type="text"
                         ref={username}
                         required
-                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl shadow-sm placeholder-gray-400 bg-white/70 text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 hover:border-gray-300"
+                        disabled={isLoading}
+                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl shadow-sm placeholder-gray-400 bg-white/70 text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 hover:border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
                         placeholder="Choose a username"
                       />
                     </div>
@@ -151,8 +249,9 @@ const Register = () => {
                         type="password"
                         ref={password}
                         required
-                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl shadow-sm placeholder-gray-400 bg-white/70 text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 hover:border-gray-300"
-                        placeholder="Create a password"
+                        disabled={isLoading}
+                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl shadow-sm placeholder-gray-400 bg-white/70 text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 hover:border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                        placeholder="Create a password (min. 6 characters)"
                       />
                     </div>
                     
@@ -166,7 +265,8 @@ const Register = () => {
                         type="password"
                         ref={confirmPassword}
                         required
-                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl shadow-sm placeholder-gray-400 bg-white/70 text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 hover:border-gray-300"
+                        disabled={isLoading}
+                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl shadow-sm placeholder-gray-400 bg-white/70 text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 hover:border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
                         placeholder="Confirm your password"
                       />
                     </div>
@@ -175,10 +275,20 @@ const Register = () => {
                   <div className="pt-4">
                     <button
                       type="submit"
-                      onClick={handleRegister}
-                      className="w-full flex justify-center py-4 px-6 border border-transparent text-base font-semibold rounded-xl text-white bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                      disabled={isLoading}
+                      className="w-full flex justify-center items-center py-4 px-6 border border-transparent text-base font-semibold rounded-xl text-white bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                     >
-                      Create Account
+                      {isLoading ? (
+                        <>
+                          <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          Creating Account...
+                        </>
+                      ) : (
+                        'Create Account'
+                      )}
                     </button>
                   </div>
                 </form>
@@ -186,21 +296,32 @@ const Register = () => {
                 <div className="text-center mt-6">
                   <p className="text-gray-600">
                     Already have an account?{' '}
-                    <p onClick={() => navigate("/login")} href="/login" className="font-semibold text-green-600 hover:text-green-700 transition-colors duration-200">
+                    <span onClick={() => navigate("/login")} className="font-semibold text-green-600 hover:text-green-700 transition-colors duration-200 cursor-pointer">
                       Sign in here
-                    </p>
+                    </span>
                   </p>
                 </div>
-                 {response && (
-                        <div className={`mt-6 p-4 rounded-xl backdrop-blur-sm ${typeof response === 'string' && response.includes("successful") ? "bg-emerald-100/80 text-emerald-800 border border-emerald-300/60" : "bg-red-100/80 text-red-800 border border-red-300/60"}`}>
-                            {typeof response === 'string' ? response : JSON.stringify(response)}
-                        </div>
-                    )}
               </div>
             </div>
           </div>
         )
       }
+      
+      <style jsx>{`
+        @keyframes slide-in {
+          from {
+            transform: translateX(100%);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+        .animate-slide-in {
+          animation: slide-in 0.3s ease-out;
+        }
+      `}</style>
     </>
   );
 };

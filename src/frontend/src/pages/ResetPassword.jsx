@@ -23,9 +23,12 @@ const ResetPassword = () => {
 
 
 return (
+  <>
   
+  <Header />
+ 
     <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
-    <Header />
+   
         <div className="bg-white p-8 rounded shadow-md w-96">
             <h2 className="text-2xl font-bold mb-6 text-center">Reset Password</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -37,6 +40,7 @@ return (
             </form>
         </div>
     </div>
+     </>
 );
 
 }
