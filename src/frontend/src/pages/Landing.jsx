@@ -1,13 +1,15 @@
 import { useNavigate } from 'react-router-dom';
 import Header from './Header.jsx';
 import { useState, useEffect } from 'react';
+import {useSelector} from 'react-redux';
 
 const Landing = () => {
     const navigate = useNavigate();
     const [btn, setBtn] = useState("Sign Up");
     const [user, setUser] = useState({});
+    const userData = useSelector((state) => state.user);
+
     useEffect(() => {
-        
         const accessToken = localStorage.getItem('accessToken');
         const storedUser = localStorage.getItem('user');
         setUser(storedUser);
@@ -22,7 +24,7 @@ const Landing = () => {
         } else {
             setBtn("Sign Up");
         }
-    }, []);
+    }, [userData]);
     const handleStartCoding = () => {
         navigate('/home');
     };

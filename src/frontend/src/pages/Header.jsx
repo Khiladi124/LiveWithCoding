@@ -94,7 +94,7 @@ const Header = () => {
         const interval = setInterval(checkTokenExpiration, 20*1000); // Check every 10 seconds
         
         return () => clearInterval(interval);
-    }, [userData, accessToken, dispatch, refreshToken]);
+    }, [userData, accessToken, dispatch, refreshToken, localUser, setLocalUser, setAdmin]);
 
     const handleLogout = async () => {
         try {
@@ -102,6 +102,8 @@ const Header = () => {
             await userService.logout(localUser);
             dispatch(clearUser());
             setLocalUser(null);
+            setAdmin(false);
+            localStorage.clear();
             navigate('/');
         } catch (error) {
             console.error("Error logging out:", error);
