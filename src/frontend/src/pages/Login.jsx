@@ -19,6 +19,9 @@ const Login = () => {
         const refreshToken=resp.refreshToken;
         console.log(resp);
         dispatch(setUser({user, accessToken, refreshToken}));
+        localStorage.setItem("user", JSON.stringify(user));
+        localStorage.setItem("accessToken", accessToken);
+        localStorage.setItem("refreshToken", refreshToken);
     }
 
     const navigate = useNavigate();

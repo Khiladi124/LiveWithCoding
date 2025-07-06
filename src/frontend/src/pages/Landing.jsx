@@ -1,9 +1,26 @@
 import { useNavigate } from 'react-router-dom';
 import Header from './Header.jsx';
+import { useState, useEffect } from 'react';
+import { useDispatch,useSelector } from 'react-redux';
+import { setUser } from '../slices/userSlice.js';
 
 const Landing = () => {
     const navigate = useNavigate();
+    const [btn, setBtn] = useState("Sign Up");
 
+    useEffect(() => {
+        const user = localStorage.getItem('user');
+        const accessToken = localStorage.getItem('accessToken');
+        
+        if (user) {
+            const userData = JSON.parse(user);
+            if (userData && userData.user && accessToken) {
+                setBtn("Login");
+            }
+        } else {
+            setBtn("Sign Up");
+        }
+    }, []);
     const handleStartCoding = () => {
         navigate('/home');
     };
@@ -37,7 +54,7 @@ const Landing = () => {
                                     Start Coding
                                 </button>
                                 <button onClick={handleSignUp} className="px-8 py-4 bg-transparent border-2 border-gray-800 text-gray-800 font-semibold rounded-full hover:bg-gray-800 hover:text-white hover:border-gray-900 transform hover:scale-105 transition-all duration-300 shadow-md backdrop-blur-sm">
-                                    Sign Up
+                                    ${btn}
                                 </button>
                             </div>
                         </div>
