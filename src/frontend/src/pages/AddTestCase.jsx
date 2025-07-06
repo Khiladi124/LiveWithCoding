@@ -48,7 +48,7 @@ const AddTestCase = () => {
     return (
         <>
         <Header />
-       
+       {
         problemId && problem && (
     <div>
         
@@ -79,6 +79,7 @@ const AddTestCase = () => {
         </div>
     </div>
         )
+    }
          </>
     );
 };
