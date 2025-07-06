@@ -27,7 +27,7 @@ const AddTestCase = () => {
             }
         };
         fetchProblem();
-    }, []);
+    }, [problemId, navigate]);
     
    
     const handleSubmit = async (e) => {
@@ -47,7 +47,7 @@ const AddTestCase = () => {
 
     return (
         <>
-        <Header />
+        
        {
         problemId && problem && (
     <div>
