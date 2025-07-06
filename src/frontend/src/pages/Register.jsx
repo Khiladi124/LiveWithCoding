@@ -19,7 +19,7 @@ const Register = () => {
     if (response === "Registration successful") {
       const timer = setTimeout(() => {
         navigate("/login");
-      }, 2000);
+      }, 3000);
       return () => clearTimeout(timer);
     }
   }, [response, navigate]);
@@ -46,17 +46,18 @@ const Register = () => {
         else {
           setResponse("Registration successful");
           alert("Registration successful");
+          email.current.value = null;
+         username.current.value = null;
+         password.current.value = null;
+         confirmPassword.current.value = null;
+         fullName.current.value = null;
         }
       })
       .catch((error) => {
         console.log(error);
       });
     
-    email.current.value = null;
-    username.current.value = null;
-    password.current.value = null;
-    confirmPassword.current.value = null;
-    fullName.current.value = null;
+    
     console.log("Registration form submitted");
 
     }
