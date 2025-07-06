@@ -3,24 +3,29 @@ import Header from './Header.jsx';
 import { useState, useEffect } from 'react';
 import { useDispatch,useSelector } from 'react-redux';
 import { setUser } from '../slices/userSlice.js';
+import { set } from 'mongoose';
 
 const Landing = () => {
     const navigate = useNavigate();
     const [btn, setBtn] = useState("Sign Up");
-
+    const [user, setUser] = useState({});
     useEffect(() => {
-        const user = localStorage.getItem('user');
-        const accessToken = localStorage.getItem('accessToken');
         
-        if (user) {
-            const userData = JSON.parse(user);
-            if (userData && userData.user && accessToken) {
+        const accessToken = localStorage.getItem('accessToken');
+        const storedUser = localStorage.getItem('user');
+        setUser(storedUser);
+        // console.log(user,storedUser,accessToken);
+        if (storedUser && accessToken) {
+            const userData = JSON.parse(storedUser);
+            console.log("User data from localStorage:", userData);
+            if (userData && accessToken) {
                 setBtn("Login");
+                console.log("User is logged in", userData);
             }
         } else {
             setBtn("Sign Up");
         }
-    }, [navigate]);
+    }, []);
     const handleStartCoding = () => {
         navigate('/home');
     };
