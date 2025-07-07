@@ -18,7 +18,7 @@ const Landing = () => {
             const userData = JSON.parse(storedUser);
             console.log("User data from localStorage:", userData);
             if (userData && accessToken) {
-                setBtn("Login");
+                setBtn("About");
                 console.log("User is logged in", userData);
             }
         } else {
@@ -30,7 +30,7 @@ const Landing = () => {
     };
 
     const handleSignUp = () => {
-        (btn==="Login")?navigate('/login'):navigate('/register');
+        (btn==="About")?navigate('/about'):navigate('/register');
     };
 
     return (

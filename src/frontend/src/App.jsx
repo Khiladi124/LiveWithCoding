@@ -37,23 +37,23 @@ const App = () => {
     },
     {
       path: "/home",
-      element: <Home />,
+      element: <Home/>,
     },
     {
       path: "/login",
-      element: <Login />,
+      element: <Login/>,
     },
     {
       path: "/register",
-      element: <Register />,
+      element: <Register/>,
     },
     {
       path: "/logout",
-      element: <Home />,
+      element: <Home/>,
     },
     {
       path: "/:problemId",
-      element: <Problem />,
+      element: <Problem/>,
     },
     {
       path: "/admin",

@@ -44,7 +44,7 @@ const Login = () => {
              console.log("User data: ", response.data.data.user); // DEBUGGING
              
             setUserData(response.data.data);
-           setTimeout( () => navigate("/"),1000);
+           setTimeout( () => navigate("/home"),1000);
         } catch (error) {
             console.log("Login error: ", error); // DEBUGGING
             setResponse(error || "Login failed");
@@ -138,7 +138,7 @@ const Login = () => {
                             <p className="text-sm text-gray-600">
                                 Don't have an account?{' '}
                                 <span 
-                                    onClick={() => { navigate("/register"); }} 
+                                    onClick={(e) => {e.preventDefault(); navigate("/register"); }} 
                                     className="font-medium text-emerald-600 hover:text-emerald-700 cursor-pointer transition-colors duration-200 underline decoration-emerald-500/50 hover:decoration-emerald-600/70"
                                 >
                                     Create one now
@@ -147,7 +147,7 @@ const Login = () => {
                             <p className="text-sm text-gray-600">
                                 Forget Password ?{' '}
                                 <span 
-                                    onClick={() => { navigate("/resetPassword"); }} 
+                                    onClick={(e) => { e.preventDefault(); navigate("/resetPassword"); }} 
                                     className="font-medium text-emerald-600 hover:text-emerald-700 cursor-pointer transition-colors duration-200 underline decoration-emerald-500/50 hover:decoration-emerald-600/70"
                                 >
                                     Reset Password
