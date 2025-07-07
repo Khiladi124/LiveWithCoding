@@ -13,64 +13,28 @@ import ResetPassword from "./pages/ResetPassword.jsx";
 import ConfirmResetPassword from "./pages/ConfirmResetPassword.jsx";
 import LinkedinBot from "./pages/LinkedinBot.jsx";
 
-const App = () => {
-  const appRouter = createBrowserRouter([
-    {
-      path: "/linkedinBot",
-      element: <LinkedinBot/>,
-    },
-    {
-      path: "/",
-      element: <Landing/>,
-    },
-    {
-      path: "/resetPassword",
-      element: <ResetPassword/>
-    },
-    {
-      path: "/resetPassword/:activationToken",
-      element: <ConfirmResetPassword/>
-    },
-    {
-      path:"/verifyEmail/:activationToken",
-      element: <VerifyEmail/>
-    },
-    {
-      path: "/home",
-      element: <Home/>,
-    },
-    {
-      path: "/login",
-      element: <Login/>,
-    },
-    {
-      path: "/register",
-      element: <Register/>,
-    },
-    {
-      path: "/logout",
-      element: <Home/>,
-    },
-    {
-      path: "/admin",
-      element: <Admin/>,
-    },
-    {
-      path:"/addTestCase/:problemId",
-      element:<AddTestCase/>
-    },
-    {
-      path: "/about",
-      element: <About />,
-    },
-    {
-      path: "/:problemId",
-      element: <Problem/>,
-    },
-  ]);
-  return (
-      <RouterProvider router={appRouter} />
-  );
-};
+const appRouter = createBrowserRouter([
+  {
+    path: "/",
+    element: <Landing />, // Optional: Replace with <RootLayout /> if needed
+    children: [
+      { path: "linkedinBot", element: <LinkedinBot /> },
+      { path: "resetPassword", element: <ResetPassword /> },
+      { path: "resetPassword/:activationToken", element: <ConfirmResetPassword /> },
+      { path: "verifyEmail/:activationToken", element: <VerifyEmail /> },
+      { path: "home", element: <Home /> },
+      { path: "login", element: <Login /> },
+      { path: "register", element: <Register /> },
+      { path: "logout", element: <Home /> },
+      { path: "admin", element: <Admin /> },
+      { path: "addTestCase/:problemId", element: <AddTestCase /> },
+      { path: "about", element: <About /> },
 
+      // 🟡 Put dynamic last
+      { path: ":problemId", element: <Problem /> },
+    ],
+  },
+]);
+
+const App = () => <RouterProvider router={appRouter} />;
 export default App;
