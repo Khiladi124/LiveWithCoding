@@ -1,5 +1,5 @@
-// src/App.jsx
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import Layout from "./pages/Layout.jsx"; // <<-- NEW
 import Home from "./pages/Home.jsx";
 import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
@@ -16,8 +16,9 @@ import LinkedinBot from "./pages/LinkedinBot.jsx";
 const appRouter = createBrowserRouter([
   {
     path: "/",
-    element: <Landing />, // Optional: Replace with <RootLayout /> if needed
+    element: <Layout />, // <<< Wraps all pages
     children: [
+      { index: true, element: <Landing /> },
       { path: "linkedinBot", element: <LinkedinBot /> },
       { path: "resetPassword", element: <ResetPassword /> },
       { path: "resetPassword/:activationToken", element: <ConfirmResetPassword /> },
@@ -30,11 +31,12 @@ const appRouter = createBrowserRouter([
       { path: "addTestCase/:problemId", element: <AddTestCase /> },
       { path: "about", element: <About /> },
 
-      // 🟡 Put dynamic last
+      // ⚠️ This must go last
       { path: ":problemId", element: <Problem /> },
     ],
   },
 ]);
 
 const App = () => <RouterProvider router={appRouter} />;
+
 export default App;
