@@ -52,10 +52,6 @@ const App = () => {
       element: <Home/>,
     },
     {
-      path: "/:problemId",
-      element: <Problem/>,
-    },
-    {
       path: "/admin",
       element: <Admin/>,
     },
@@ -67,7 +63,10 @@ const App = () => {
       path: "/about",
       element: <About />,
     },
-
+    {
+      path: "/:problemId",
+      element: <Problem/>,
+    },
   ]);
   return (
       <RouterProvider router={appRouter} />
